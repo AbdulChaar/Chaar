@@ -9,12 +9,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     :root {
-      --primary: #2b5876;
-      --secondary: #4e4376;
-      --accent: #ff7e5f;
-      --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-      --card-bg: rgba(255, 255, 255, 0.92);
-      --text: #2c3e50;
+      --primary: #1e3a8a;
+      --secondary: #3b82f6;
+      --accent: #10b981;
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text: #0f172a;
     }
     
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,71 +25,71 @@
       color: var(--text); 
       padding: 15px; 
       min-height: 100vh;
-      transition: background 0.5s ease;
     }
-    .container { max-width: 650px; margin: 0 auto; }
+    .container { max-width: 680px; margin: 0 auto; }
     
     header { 
-      background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+      background: linear-gradient(135deg, #1e3a8a, #0284c7); 
       color: white; 
       padding: 18px; 
       border-radius: 16px; 
       text-align: center; 
       margin-bottom: 12px; 
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3); 
     }
-    header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    header h1 { font-size: 1.6rem; margin-bottom: 4px; }
     header p { font-size: 0.85rem; opacity: 0.9; }
 
     /* Top Utility Bar */
     .utility-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
-    .theme-selector { display: flex; gap: 4px; }
-    .theme-btn { border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid white; }
+    .theme-selector { display: flex; gap: 6px; }
+    .theme-btn { border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid white; }
 
     /* Room Setup */
-    .room-bar { display: flex; gap: 10px; justify-content: center; align-items: center; background: var(--card-bg); padding: 10px; border-radius: 12px; backdrop-filter: blur(5px); }
+    .room-bar { display: flex; gap: 10px; justify-content: center; align-items: center; background: var(--card-bg); padding: 10px; border-radius: 12px; }
     .room-input { width: 90px; padding: 6px; font-size: 1.1rem; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: bold; }
     
     /* Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { flex: 1; min-width: 65px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.7); color: #444; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-    .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(43,88,118,0.3); }
+    .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
     
-    .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); margin-bottom: 12px; backdrop-filter: blur(8px); }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); margin-bottom: 12px; }
 
     /* Voice Bar */
     .voice-bar { text-align: center; padding: 10px; }
-    .voice-btn { background: #e11d48; color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(225,29,72,0.3); }
-    .voice-btn:active { transform: scale(0.95); background: #be123c; }
+    .voice-btn { background: #ef4444; color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(239,68,68,0.3); }
+    .voice-btn:active { transform: scale(0.95); background: #dc2626; }
 
     /* Avatars */
     .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
     .avatar-card { border: 2px solid #e2e8f0; border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; background: white; }
-    .avatar-card.selected { border-color: var(--accent); background: #fff5f2; box-shadow: 0 0 0 2px var(--accent); }
+    .avatar-card.selected { border-color: var(--secondary); background: #eff6ff; box-shadow: 0 0 0 2px var(--secondary); }
     .avatar-card span { font-size: 1.8rem; display: block; }
     .avatar-card p { font-size: 0.75rem; font-weight: bold; margin-top: 4px; }
 
     /* Canvas */
     canvas { border: 2px dashed #cbd5e1; border-radius: 12px; width: 100%; height: 280px; background: white; touch-action: none; }
-    .controls { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
 
-    /* Game Boards */
-    .board-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 260px; margin: 15px auto; }
-    .board-grid-c4 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; max-width: 320px; margin: 15px auto; background: #1e3a8a; padding: 8px; border-radius: 12px; }
-    .board-grid-mem { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 280px; margin: 15px auto; }
+    /* Soccer Game Styling */
+    .soccer-field { width: 100%; height: 260px; background: #15803d; border-radius: 12px; border: 3px solid white; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 10px 0; }
+    .goal-post { width: 160px; height: 60px; border: 4px solid white; border-bottom: none; background: rgba(255,255,255,0.15); position: relative; }
+    .keeper { font-size: 2rem; position: absolute; bottom: 0; left: 65px; transition: left 0.3s ease; }
+    .ball { font-size: 2.2rem; cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     
-    .cell { aspect-ratio: 1; background: #f8fafc; border-radius: 10px; font-size: 2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-    .c4-cell { aspect-ratio: 1; background: white; border-radius: 50%; cursor: pointer; }
-    .c4-cell.red { background: #ef4444; }
-    .c4-cell.yellow { background: #eab308; }
-    
-    /* Hangman & Educational UI */
-    .word-display { font-size: 1.8rem; letter-spacing: 8px; margin: 15px 0; font-weight: bold; text-align: center; color: var(--primary); }
-    .keyboard-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
-    .key-btn { width: 32px; height: 36px; border: 1px solid #cbd5e1; background: white; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .key-btn.used { background: #cbd5e1; cursor: not-allowed; opacity: 0.5; }
-    
-    .btn { padding: 8px 14px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+    /* Lego Builder Styling */
+    .lego-palette { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+    .lego-color { width: 32px; height: 32px; border-radius: 6px; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .lego-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; max-width: 320px; margin: 0 auto; background: #cbd5e1; padding: 4px; border-radius: 8px; }
+    .lego-stud { aspect-ratio: 1; background: #e2e8f0; border-radius: 4px; cursor: pointer; position: relative; }
+    .lego-stud::after { content: ''; position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; background: rgba(0,0,0,0.1); border-radius: 50%; }
+
+    /* Puzzle Styling */
+    .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 270px; margin: 15px auto; background: #334155; padding: 6px; border-radius: 10px; }
+    .puzzle-tile { aspect-ratio: 1; background: #3b82f6; color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; }
+    .puzzle-tile.empty { background: transparent; cursor: default; }
+
+    .btn { padding: 9px 16px; border: none; border-radius: 8px; background: var(--secondary); color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
     .btn-secondary { background: #64748b; }
     .status-text { margin-bottom: 8px; font-weight: bold; color: var(--primary); text-align: center; }
   </style>
@@ -105,11 +105,10 @@
   <!-- UTILITY & WALLPAPER BAR -->
   <div class="utility-bar">
     <div class="theme-selector">
-      <button class="theme-btn" style="background: linear-gradient(135deg, #e0c3fc, #8ec5fc);" onclick="setTheme('sky')" title="Sky Blue"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #ff9a9e, #fecfef);" onclick="setTheme('sunset')" title="Sunset Warmth"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #84fab0, #8fd3f4);" onclick="setTheme('mosaic')" title="Mosaic Teal"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #13547a, #80d0c7);" onclick="setTheme('forest')" title="Cedar Forest"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #232526, #414345);" onclick="setTheme('night')" title="Night Sky"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #0f172a, #1e293b);" onclick="setTheme('dark')" title="Dark Stadium"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #15803d, #4ade80);" onclick="setTheme('pitch')" title="Pitch Green"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);" onclick="setTheme('blue')" title="Ocean Blue"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #b91c1c, #f87171);" onclick="setTheme('red')" title="Champions Red"></button>
     </div>
     <div>
       <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
@@ -134,27 +133,63 @@
 
   <!-- NAVIGATION TABS -->
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="showTab('family')">Family</button>
-    <button class="tab-btn" onclick="showTab('draw')">Draw</button>
+    <button class="tab-btn active" onclick="showTab('family')">Profile</button>
+    <button class="tab-btn" onclick="showTab('soccer')">Soccer Shootout ⚽</button>
+    <button class="tab-btn" onclick="showTab('lego')">Lego Builder 🧱</button>
+    <button class="tab-btn" onclick="showTab('puzzle')">Sliding Puzzle 🧩</button>
+    <button class="tab-btn" onclick="showTab('draw')">Draw 🎨</button>
     <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe</button>
-    <button class="tab-btn" onclick="showTab('hangman')">Hangman</button>
-    <button class="tab-btn" onclick="showTab('math')">Math Fun</button>
-    <button class="tab-btn" onclick="showTab('memory')">Memory</button>
   </div>
 
-  <!-- FAMILY TAB -->
+  <!-- FAMILY PROFILE TAB -->
   <div id="tab-family" class="card">
     <h3>Select Your Profile</h3>
     <div class="avatar-grid">
       <div class="avatar-card selected" onclick="selectAvatar(this, 'Jedo 👴')"><span>👴</span><p>Jedo</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Teta 👵')"><span>👵</span><p>Teta</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Mama / Sara 👩')"><span>👩</span><p>Mama / Sara</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this, 'Fouad 👦')"><span>👦</span><p>Fouad</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this, 'Zayd ⚽')"><span>⚽</span><p>Zayd</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this, 'Majd 🎨')"><span>🎨</span><p>Majd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Fouad ⚽')"><span>⚽</span><p>Fouad (15)</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Zayd 🏃')"><span>🏃</span><p>Zayd (11)</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Majd 🎨')"><span>🎨</span><p>Majd (10)</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Lebanon 🇱🇧')"><span>🇱🇧</span><p>Cousins (Lebanon)</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Istanbul 🇹🇷')"><span>🇹🇷</span><p>Cousins (Istanbul)</p></div>
     </div>
+  </div>
+
+  <!-- SOCCER PENALTY SHOOTOUT -->
+  <div id="tab-soccer" class="card" style="display:none;">
+    <h3>Penalty Shootout Arena ⚽</h3>
+    <div class="status-text" id="soccerStatus">Tap the Ball to Kick! Goals Scored: 0</div>
+    <div class="soccer-field">
+      <div class="goal-post">
+        <div class="keeper" id="keeper">🧤</div>
+      </div>
+      <div class="ball" id="soccerBall" onclick="kickBall()">⚽</div>
+    </div>
+  </div>
+
+  <!-- LEGO BRICK BUILDER -->
+  <div id="tab-lego" class="card" style="display:none;">
+    <h3>Shared Lego Studio 🧱</h3>
+    <p style="font-size:0.8rem; text-align:center; margin-bottom:8px;">Build structures live across Dallas & Lebanon!</p>
+    <div class="lego-palette">
+      <div class="lego-color" style="background:#ef4444;" onclick="setLegoColor('#ef4444')"></div>
+      <div class="lego-color" style="background:#3b82f6;" onclick="setLegoColor('#3b82f6')"></div>
+      <div class="lego-color" style="background:#eab308;" onclick="setLegoColor('#eab308')"></div>
+      <div class="lego-color" style="background:#22c55e;" onclick="setLegoColor('#22c55e')"></div>
+      <div class="lego-color" style="background:#a855f7;" onclick="setLegoColor('#a855f7')"></div>
+      <div class="lego-color" style="background:#e2e8f0;" onclick="setLegoColor('#e2e8f0')"></div>
+    </div>
+    <div class="lego-grid" id="legoGrid"></div>
+    <div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" onclick="resetLego(true)">Clear Baseplate</button></div>
+  </div>
+
+  <!-- SLIDING JIGSAW PUZZLE -->
+  <div id="tab-puzzle" class="card" style="display:none;">
+    <h3>Sports & Travel Slider Puzzle 🧩</h3>
+    <div class="status-text" id="puzzleStatus">Slide tiles to match 1 to 8!</div>
+    <div class="puzzle-grid" id="puzzleGrid"></div>
+    <div style="text-align:center;"><button class="btn btn-secondary" onclick="initPuzzle()">Shuffle Puzzle</button></div>
   </div>
 
   <!-- DRAWING TAB -->
@@ -169,50 +204,25 @@
 
   <!-- TIC TAC TOE -->
   <div id="tab-tictactoe" class="card" style="display:none;">
-    <h3>Tic-Tac-Toe</h3>
+    <h3>Tic-Tac-Toe Arena</h3>
     <div class="status-text" id="ticStatus">Current Turn: ❌</div>
-    <div class="board-grid-3">
-      <div class="cell" onclick="playTic(0)"></div>
-      <div class="cell" onclick="playTic(1)"></div>
-      <div class="cell" onclick="playTic(2)"></div>
-      <div class="cell" onclick="playTic(3)"></div>
-      <div class="cell" onclick="playTic(4)"></div>
-      <div class="cell" onclick="playTic(5)"></div>
-      <div class="cell" onclick="playTic(6)"></div>
-      <div class="cell" onclick="playTic(7)"></div>
-      <div class="cell" onclick="playTic(8)"></div>
+    <div class="board-grid-3" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:260px; margin:15px auto;">
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(0)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(1)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(2)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(3)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(4)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(5)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(6)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(7)"></div>
+      <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(8)"></div>
     </div>
     <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetTic(true)">Reset Board</button></div>
-  </div>
-
-  <!-- HANGMAN GAME -->
-  <div id="tab-hangman" class="card" style="display:none;">
-    <h3>Family Word Guess</h3>
-    <div class="status-text" id="hangmanStatus">Lives Remaining: ❤️❤️❤️❤️❤️❤️</div>
-    <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
-    <div class="keyboard-grid" id="hangmanKeyboard"></div>
-    <div style="text-align:center; margin-top:15px;"><button class="btn btn-secondary" onclick="resetHangman()">Next Word</button></div>
-  </div>
-
-  <!-- MATH FUN EDUCATIONAL GAME -->
-  <div id="tab-math" class="card" style="display:none;">
-    <h3>Math Challenge 🧠</h3>
-    <div class="status-text" id="mathScore">Score: 0</div>
-    <div style="font-size: 2.2rem; font-weight: bold; text-align: center; margin: 15px 0; color: var(--primary);" id="mathProblem">5 + 3 = ?</div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 240px; margin: 0 auto;" id="mathOptions"></div>
-  </div>
-
-  <!-- MEMORY MATCH -->
-  <div id="tab-memory" class="card" style="display:none;">
-    <h3>Family Memory Match</h3>
-    <div class="status-text" id="memStatus">Find matching pairs!</div>
-    <div class="board-grid-mem" id="memBoard"></div>
-    <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetMem()">New Game</button></div>
   </div>
 </div>
 
 <script>
-  // Firebase Configuration
+  // Pre-filled Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyBvUCpwqDe9VwDnuLo3EP34BbTEFljqjfs",
     authDomain: "fouad-n-family.firebaseapp.com",
@@ -228,7 +238,7 @@
   let roomRef = null;
   let currentRoom = "1234";
 
-  // --- AUDIO SYNTHESIS & SOUND EFFECTS ---
+  // --- AUDIO SYNTHESIS & SOUNDS ---
   let audioCtx = null;
   let isMusicPlaying = false;
   let musicInterval = null;
@@ -255,9 +265,7 @@
 
   function playVictorySound() {
     const fanfare = [523.25, 659.25, 783.99, 1046.50];
-    fanfare.forEach((f, idx) => {
-      setTimeout(() => playTone(f, 'triangle', 0.25), idx * 120);
-    });
+    fanfare.forEach((f, idx) => setTimeout(() => playTone(f, 'triangle', 0.25), idx * 120));
   }
 
   function toggleMusic() {
@@ -278,16 +286,14 @@
     }
   }
 
-  // --- WALLPAPERS & THEMES ---
   function setTheme(theme) {
     const gradients = {
-      sky: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
-      sunset: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #feada6 100%)',
-      mosaic: 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
-      forest: 'linear-gradient(135deg, #13547a 0%, #80d0c7 100%)',
-      night: 'linear-gradient(135deg, #232526 0%, #414345 100%)'
+      dark: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      pitch: 'linear-gradient(135deg, #15803d 0%, #4ade80 100%)',
+      blue: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+      red: 'linear-gradient(135deg, #b91c1c 0%, #f87171 100%)'
     };
-    document.body.style.background = gradients[theme] || gradients.sky;
+    document.body.style.background = gradients[theme] || gradients.dark;
     playTone(440, 'triangle', 0.1);
   }
 
@@ -298,7 +304,7 @@
   function startVoiceRecording() {
     initAudio();
     document.getElementById('voiceStatus').innerText = "🎙️ Recording... Release button to send!";
-    document.getElementById('voiceStatus').style.color = "#e11d48";
+    document.getElementById('voiceStatus').style.color = "#ef4444";
     audioChunks = [];
 
     navigator.mediaDevices.getUserMedia({ audio: true })
@@ -310,17 +316,12 @@
           const reader = new FileReader();
           reader.readAsDataURL(blob);
           reader.onloadend = () => {
-            const base64Audio = reader.result;
-            if (roomRef) {
-              roomRef.child('voice_notes').push({ audio: base64Audio, timestamp: Date.now() });
-            }
+            if (roomRef) roomRef.child('voice_notes').push({ audio: reader.result, timestamp: Date.now() });
           };
         };
         mediaRecorder.start();
       })
-      .catch(err => {
-        document.getElementById('voiceStatus').innerText = "Microphone access denied.";
-      });
+      .catch(err => { document.getElementById('voiceStatus').innerText = "Microphone access denied."; });
   }
 
   function stopVoiceRecording() {
@@ -332,7 +333,7 @@
     }
   }
 
-  // --- FIREBASE ROOM CONNECTION ---
+  // --- FIREBASE SYNC ---
   function connectRoom() {
     currentRoom = document.getElementById('roomCode').value.trim() || "1234";
     roomRef = db.ref('rooms/' + currentRoom);
@@ -347,8 +348,16 @@
     roomRef.child('voice_notes').limitToLast(1).on('child_added', snapshot => {
       const data = snapshot.val();
       if (data && data.audio) {
-        const container = document.getElementById('voicePlayerContainer');
-        container.innerHTML = `<audio controls src="${data.audio}" autoplay style="width:100%; height:36px;"></audio>`;
+        document.getElementById('voicePlayerContainer').innerHTML = `<audio controls src="${data.audio}" autoplay style="width:100%; height:36px;"></audio>`;
+      }
+    });
+
+    // Lego sync
+    roomRef.child('lego').on('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        legoBoard = data;
+        renderLegoBoard();
       }
     });
 
@@ -363,29 +372,133 @@
       const pt = snapshot.val();
       if (pt && ctx) drawLine(pt.x0, pt.y0, pt.x1, pt.y1, pt.color);
     });
-
-    roomRef.child('draw_clear').on('value', snapshot => {
-      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
+    roomRef.child('draw_clear').on('value', () => { if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); });
   }
 
-  // --- TABS NAVIGATION ---
+  // --- TAB ROUTING ---
   function showTab(name) {
-    ['family', 'draw', 'tictactoe', 'hangman', 'math', 'memory'].forEach(t => {
+    ['family', 'soccer', 'lego', 'puzzle', 'draw', 'tictactoe'].forEach(t => {
       document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
     if(name === 'draw') setTimeout(initCanvas, 50);
-    if(name === 'hangman') resetHangman();
-    if(name === 'math') nextMathProblem();
-    if(name === 'memory') resetMem();
+    if(name === 'lego') initLegoGrid();
+    if(name === 'puzzle') initPuzzle();
   }
 
   function selectAvatar(el, name) {
     document.querySelectorAll('.avatar-card').forEach(a => a.classList.remove('selected'));
     el.classList.add('selected');
     playTone(523.25, 'sine', 0.1);
+  }
+
+  // --- SOCCER PENALTY GAME ---
+  let goalsScored = 0;
+  function kickBall() {
+    const ball = document.getElementById('soccerBall');
+    const keeper = document.getElementById('keeper');
+    
+    // Random shot direction (-60 to +60 px) & Keeper jump (-70 to +70 px)
+    const shotX = (Math.random() - 0.5) * 130;
+    const keeperX = (Math.random() - 0.5) * 130;
+    
+    keeper.style.left = (65 + keeperX) + 'px';
+    ball.style.transform = `translate(${shotX}px, -180px) scale(0.6)`;
+    
+    playTone(350, 'square', 0.15);
+
+    setTimeout(() => {
+      if (Math.abs(shotX - keeperX) > 35) {
+        goalsScored++;
+        document.getElementById('soccerStatus').innerText = `⚽ GOAL! Total Goals: ${goalsScored}`;
+        playVictorySound();
+      } else {
+        document.getElementById('soccerStatus').innerText = "🧤 SAVED! Try again!";
+        playTone(180, 'sawtooth', 0.25);
+      }
+
+      setTimeout(() => {
+        ball.style.transform = `translate(0px, 0px) scale(1)`;
+        keeper.style.left = '65px';
+      }, 1000);
+    }, 400);
+  }
+
+  // --- LEGO BRICK BUILDER ---
+  let selectedLegoColor = '#ef4444';
+  let legoBoard = Array(100).fill('#e2e8f0');
+
+  function setLegoColor(color) { selectedLegoColor = color; playTone(600, 'sine', 0.05); }
+
+  function initLegoGrid() {
+    const grid = document.getElementById('legoGrid');
+    if (grid.children.length > 0) return;
+    grid.innerHTML = '';
+    for (let i = 0; i < 100; i++) {
+      const stud = document.createElement('div');
+      stud.className = 'lego-stud';
+      stud.onclick = () => placeLego(i);
+      grid.appendChild(stud);
+    }
+    renderLegoBoard();
+  }
+
+  function placeLego(idx) {
+    legoBoard[idx] = selectedLegoColor;
+    renderLegoBoard();
+    playTone(500, 'square', 0.08);
+    if (roomRef) roomRef.child('lego').set(legoBoard);
+  }
+
+  function renderLegoBoard() {
+    const studs = document.querySelectorAll('.lego-stud');
+    legoBoard.forEach((color, idx) => {
+      if (studs[idx]) studs[idx].style.background = color;
+    });
+  }
+
+  function resetLego(b) {
+    legoBoard = Array(100).fill('#e2e8f0');
+    renderLegoBoard();
+    if (b && roomRef) roomRef.child('lego').set(legoBoard);
+  }
+
+  // --- SLIDING JIGSAW PUZZLE ---
+  let puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, ""];
+
+  function initPuzzle() {
+    puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, ""].sort(() => Math.random() - 0.5);
+    renderPuzzle();
+  }
+
+  function renderPuzzle() {
+    const grid = document.getElementById('puzzleGrid');
+    grid.innerHTML = '';
+    puzzleTiles.forEach((tile, idx) => {
+      const div = document.createElement('div');
+      div.className = 'puzzle-tile' + (tile === "" ? ' empty' : '');
+      div.innerText = tile;
+      div.onclick = () => movePuzzleTile(idx);
+      grid.appendChild(div);
+    });
+  }
+
+  function movePuzzleTile(idx) {
+    const emptyIdx = puzzleTiles.indexOf("");
+    const validMoves = [idx - 1, idx + 1, idx - 3, idx + 3];
+    
+    if (validMoves.includes(emptyIdx)) {
+      puzzleTiles[emptyIdx] = puzzleTiles[idx];
+      puzzleTiles[idx] = "";
+      playTone(450, 'sine', 0.1);
+      renderPuzzle();
+      
+      if (puzzleTiles.join('') === "12345678") {
+        document.getElementById('puzzleStatus').innerText = "🎉 Puzzle Solved!";
+        playVictorySound();
+      }
+    }
   }
 
   // --- DRAWING CANVAS ---
@@ -429,7 +542,7 @@
     if(broadcast && roomRef) { roomRef.child('draw').remove(); roomRef.child('draw_clear').set(Date.now()); }
   }
 
-  // --- TIC TAC TOE WITH WIN SOUND ---
+  // --- TIC TAC TOE ---
   let boardTic = Array(9).fill('');
   let turnTic = '❌';
 
@@ -468,146 +581,7 @@
     if(b && roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic }); 
   }
 
-  // --- HANGMAN GAME ---
-  const words = ["BEIRUT", "DALLAS", "ISTANBUL", "SOCCER", "JEDO", "TETA", "TURKEY", "FAMILY"];
-  let currentWord = "", guessedLetters = [], lives = 6;
-
-  function resetHangman() {
-    currentWord = words[Math.floor(Math.random() * words.length)];
-    guessedLetters = [];
-    lives = 6;
-    renderHangman();
-  }
-
-  function renderHangman() {
-    document.getElementById('hangmanStatus').innerText = "Lives Remaining: " + "❤️".repeat(lives);
-    let display = "";
-    for(let char of currentWord) {
-      display += guessedLetters.includes(char) ? char + " " : "_ ";
-    }
-    document.getElementById('wordDisplay').innerText = display;
-
-    const kb = document.getElementById('hangmanKeyboard');
-    kb.innerHTML = "";
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(let => {
-      const btn = document.createElement('button');
-      btn.className = "key-btn" + (guessedLetters.includes(let) ? " used" : "");
-      btn.innerText = let;
-      btn.onclick = () => guessLetter(let);
-      kb.appendChild(btn);
-    });
-
-    if(!display.includes("_")) {
-      document.getElementById('hangmanStatus').innerText = "🎉 Word Cleared!";
-      playVictorySound();
-    } else if(lives <= 0) {
-      document.getElementById('hangmanStatus').innerText = "❌ Game Over! Word was: " + currentWord;
-    }
-  }
-
-  function guessLetter(l) {
-    if(!guessedLetters.includes(l) && lives > 0) {
-      guessedLetters.push(l);
-      if(!currentWord.includes(l)) {
-        lives--;
-        playTone(200, 'sawtooth', 0.2);
-      } else {
-        playTone(600, 'sine', 0.1);
-      }
-      renderHangman();
-    }
-  }
-
-  // --- EDUCATIONAL MATH GAME ---
-  let mathAns = 0, mathScore = 0;
-
-  function nextMathProblem() {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    const isPlus = Math.random() > 0.3;
-    
-    if(isPlus) {
-      mathAns = num1 + num2;
-      document.getElementById('mathProblem').innerText = `${num1} + ${num2} = ?`;
-    } else {
-      const max = Math.max(num1, num2);
-      const min = Math.min(num1, num2);
-      mathAns = max - min;
-      document.getElementById('mathProblem').innerText = `${max} - ${min} = ?`;
-    }
-
-    const optsDiv = document.getElementById('mathOptions');
-    optsDiv.innerHTML = "";
-    
-    let choices = [mathAns, mathAns + 1, mathAns - 1, mathAns + 2].sort(() => Math.random() - 0.5);
-    choices.forEach(c => {
-      const btn = document.createElement('button');
-      btn.className = 'btn';
-      btn.style.fontSize = '1.2rem';
-      btn.style.padding = '12px';
-      btn.innerText = c;
-      btn.onclick = () => {
-        if(c === mathAns) {
-          mathScore++;
-          playTone(800, 'sine', 0.15);
-          nextMathProblem();
-        } else {
-          playTone(220, 'sawtooth', 0.2);
-        }
-        document.getElementById('mathScore').innerText = "Score: " + mathScore;
-      };
-      optsDiv.appendChild(btn);
-    });
-  }
-
-  // --- MEMORY GAME ---
-  const memIcons = ['⚽', '⚽', '🎨', '🎨', '✈️', '✈️', '🇱🇧', '🇱🇧', '🇹🇷', '🇹🇷', '👴', '👴'];
-  let flipped = [], matched = 0;
-
-  function resetMem() {
-    const b = document.getElementById('memBoard');
-    b.innerHTML = '';
-    flipped = []; matched = 0;
-    const shuffled = [...memIcons].sort(() => Math.random() - 0.5);
-    shuffled.forEach((icon) => {
-      const card = document.createElement('div');
-      card.className = 'cell';
-      card.dataset.icon = icon;
-      card.innerText = '❓';
-      card.onclick = () => flipMem(card);
-      b.appendChild(card);
-    });
-    document.getElementById('memStatus').innerText = "Find matching pairs!";
-  }
-
-  function flipMem(card) {
-    if(flipped.length < 2 && card.innerText === '❓') {
-      card.innerText = card.dataset.icon;
-      flipped.push(card);
-      playTone(600, 'sine', 0.1);
-      if(flipped.length === 2) {
-        if(flipped[0].dataset.icon === flipped[1].dataset.icon) {
-          matched += 2;
-          flipped = [];
-          playTone(800, 'triangle', 0.2);
-          if(matched === memIcons.length) {
-            document.getElementById('memStatus').innerText = "🎉 You matched them all!";
-            playVictorySound();
-          }
-        } else {
-          setTimeout(() => {
-            if(flipped.length === 2) {
-              flipped[0].innerText = '❓';
-              flipped[1].innerText = '❓';
-              flipped = [];
-            }
-          }, 800);
-        }
-      }
-    }
-  }
-
-  // Connect automatically on launch
+  // Auto connect on start
   connectRoom();
 </script>
 
