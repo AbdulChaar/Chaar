@@ -5,17 +5,207 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FamilyHaven Play</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; text-align: center; background: #f0f4f8; margin: 0; padding: 20px; }
-    .card { background: white; border-radius: 12px; padding: 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    h1 { color: #2c3e50; }
-    p { color: #7f8c8d; }
+    :root {
+      --primary: #2b5876;
+      --secondary: #4e4376;
+      --accent: #ff7e5f;
+      --bg: #f4f7f6;
+      --text: #2c3e50;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); padding: 15px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    header h1 { font-size: 1.6rem; margin-bottom: 5px; }
+    header p { font-size: 0.9rem; opacity: 0.9; }
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; padding: 12px 6px; border: none; background: #e0e6ed; color: #555; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+    .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(43,88,118,0.3); }
+    .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
+    
+    /* Avatars */
+    .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+    .avatar-card { border: 2px solid #eee; border-radius: 12px; padding: 8px; text-align: center; cursor: pointer; }
+    .avatar-card.selected { border-color: var(--accent); background: #fff5f2; }
+    .avatar-card span { font-size: 1.8rem; display: block; }
+    .avatar-card p { font-size: 0.75rem; font-weight: bold; margin-top: 4px; }
+
+    /* Trivia */
+    .trivia-q { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; }
+    .trivia-opt { display: block; width: 100%; padding: 12px; margin-bottom: 8px; border: 2px solid #e2e8f0; border-radius: 10px; background: white; text-align: left; font-size: 0.95rem; cursor: pointer; }
+    .trivia-opt:hover { border-color: var(--primary); background: #f8fafc; }
+    .feedback { font-weight: bold; margin-top: 10px; font-size: 0.95rem; }
+
+    /* Drawing Canvas */
+    canvas { border: 2px dashed #cbd5e1; border-radius: 12px; width: 100%; height: 300px; background: white; touch-action: none; }
+    .controls { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+    .btn { padding: 10px 16px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+    .btn-secondary { background: #64748b; }
+
+    /* Board games */
+    .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 280px; margin: 15px auto; }
+    .cell { aspect-ratio: 1; background: #f1f5f9; border-radius: 10px; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Welcome to FamilyHaven Play!</h1>
-    <p>Dallas ✈️ St. Louis ✈️ Istanbul ✈️ Lebanon</p>
-    <p>Your interactive family room is almost ready!</p>
+
+<div class="container">
+  <header>
+    <h1>FamilyHaven Play 🌍</h1>
+    <p>Connecting Dallas 🇺🇸 St. Louis 🇺🇸 Istanbul 🇹🇷 Lebanon 🇱🇧</p>
+  </header>
+
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('family')">Family</button>
+    <button class="tab-btn" onclick="showTab('trivia')">Trivia</button>
+    <button class="tab-btn" onclick="showTab('draw')">Draw</button>
+    <button class="tab-btn" onclick="showTab('games')">Games</button>
   </div>
+
+  <!-- FAMILY TAB -->
+  <div id="tab-family" class="card">
+    <h3>Choose Your Player Profile</h3>
+    <div class="avatar-grid">
+      <div class="avatar-card selected" onclick="selectAvatar(this)"><span>👴</span><p>Jedo</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>👵</span><p>Teta</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>👩</span><p>Mama / Sara</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>👦</span><p>Fouad</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>⚽</span><p>Zayd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>🎨</span><p>Majd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇱🇧</span><p>Cousins (Lebanon)</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇹🇷</span><p>Cousins (Istanbul)</p></div>
+    </div>
+  </div>
+
+  <!-- TRIVIA TAB -->
+  <div id="tab-trivia" class="card" style="display:none;">
+    <div class="trivia-q" id="trivia-q">Loading question...</div>
+    <div id="trivia-opts"></div>
+    <div class="feedback" id="trivia-feedback"></div>
+    <button class="btn" style="margin-top:15px;" onclick="nextQuestion()">Next Question ➡️</button>
+  </div>
+
+  <!-- DRAWING TAB -->
+  <div id="tab-draw" class="card" style="display:none;">
+    <h3>Family Touch Canvas</h3>
+    <p style="font-size:0.8rem; margin-bottom:10px;">Draw together across devices!</p>
+    <canvas id="paintCanvas"></canvas>
+    <div class="controls">
+      <input type="color" id="colorPicker" value="#ff7e5f">
+      <button class="btn btn-secondary" onclick="clearCanvas()">Clear</button>
+    </div>
+  </div>
+
+  <!-- GAMES TAB -->
+  <div id="tab-games" class="card" style="display:none;">
+    <h3>Tic-Tac-Toe Arena</h3>
+    <div class="board-grid" id="ticBoard">
+      <div class="cell" onclick="playTic(0)"></div>
+      <div class="cell" onclick="playTic(1)"></div>
+      <div class="cell" onclick="playTic(2)"></div>
+      <div class="cell" onclick="playTic(3)"></div>
+      <div class="cell" onclick="playTic(4)"></div>
+      <div class="cell" onclick="playTic(5)"></div>
+      <div class="cell" onclick="playTic(6)"></div>
+      <div class="cell" onclick="playTic(7)"></div>
+      <div class="cell" onclick="playTic(8)"></div>
+    </div>
+    <button class="btn btn-secondary" onclick="resetTic()">Reset Game</button>
+  </div>
+</div>
+
+<script>
+  function showTab(name) {
+    ['family', 'trivia', 'draw', 'games'].forEach(t => {
+      document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    if(name === 'draw') initCanvas();
+  }
+
+  function selectAvatar(el) {
+    document.querySelectorAll('.avatar-card').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // TRIVIA LOGIC
+  const questions = [
+    { q: "Where do Fouad, Zayd, and Majd live?", opts: ["St. Louis", "Dallas", "Istanbul", "Beirut"], ans: 1 },
+    { q: "Where do their cousins live?", opts: ["Lebanon & Istanbul", "Dallas", "New York", "London"], ans: 0 },
+    { q: "What sport do the boys in Dallas love playing?", opts: ["Basketball", "Soccer", "Tennis", "Swimming"], ans: 1 }
+  ];
+  let curQ = 0;
+
+  function loadQuestion() {
+    const q = questions[curQ];
+    document.getElementById('trivia-q').innerText = q.q;
+    const optsDiv = document.getElementById('trivia-opts');
+    optsDiv.innerHTML = '';
+    document.getElementById('trivia-feedback').innerText = '';
+    q.opts.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'trivia-opt';
+      btn.innerText = opt;
+      btn.onclick = () => {
+        if(idx === q.ans) {
+          document.getElementById('trivia-feedback').innerText = "🎉 Correct!";
+          document.getElementById('trivia-feedback').style.color = "green";
+        } else {
+          document.getElementById('trivia-feedback').innerText = "❌ Try again!";
+          document.getElementById('trivia-feedback').style.color = "red";
+        }
+      };
+      optsDiv.appendChild(btn);
+    });
+  }
+  function nextQuestion() { curQ = (curQ + 1) % questions.length; loadQuestion(); }
+  loadQuestion();
+
+  // CANVAS LOGIC
+  let canvas, ctx, drawing = false;
+  function initCanvas() {
+    canvas = document.getElementById('paintCanvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    function start(e) { drawing = true; draw(e); }
+    function stop() { drawing = false; ctx.beginPath(); }
+    function draw(e) {
+      if(!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = document.getElementById('colorPicker').value;
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+    canvas.onmousedown = start; canvas.onmouseup = stop; canvas.onmousemove = draw;
+    canvas.ontouchstart = start; canvas.ontouchend = stop; canvas.ontouchmove = draw;
+  }
+  function clearCanvas() { if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+  // TIC-TAC-TOE LOGIC
+  let board = Array(9).fill('');
+  let turn = '❌';
+  function playTic(i) {
+    if(!board[i]) {
+      board[i] = turn;
+      document.getElementsByClassName('cell')[i].innerText = turn;
+      turn = (turn === '❌') ? '⭕' : '❌';
+    }
+  }
+  function resetTic() {
+    board.fill('');
+    Array.from(document.getElementsByClassName('cell')).forEach(c => c.innerText = '');
+    turn = '❌';
+  }
+</script>
+
 </body>
 </html>
