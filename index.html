@@ -164,10 +164,10 @@
   <div id="tab-hangman" class="card" style="display:none;">
     <h3>Hangman Studio 🔤</h3>
     <div class="subject-selector">
-      <button class="subj-btn active" onclick="setSubject('soccer')">⚽ Soccer</button>
+      <button class="subj-btn active" onclick="setSubject('islamic')">🌙 Islamic</button>
+      <button class="subj-btn" onclick="setSubject('soccer')">⚽ Soccer</button>
       <button class="subj-btn" onclick="setSubject('cities')">🌍 World Cities</button>
       <button class="subj-btn" onclick="setSubject('family')">❤️ Family</button>
-      <button class="subj-btn" onclick="setSubject('movies')">🎬 Movies</button>
     </div>
     <div class="status-text" id="hangmanStatus">Lives Remaining: ❤️❤️❤️❤️❤️❤️</div>
     <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
@@ -389,8 +389,17 @@
     playTone(523.25, 'sine', 0.1);
   }
 
-  // --- HANGMAN STUDIO WITH CATEGORIES & HINTS ---
+  // --- HANGMAN STUDIO WITH ISLAMIC CATEGORY ---
   const hangmanData = {
+    islamic: [
+      { w: "RAMADAN", h: "The holy month of fasting and reflection" },
+      { w: "QURAN", h: "The holy book revealed to Prophet Muhammad (PBUH)" },
+      { w: "KAABA", h: "The sacred house located in Makkah" },
+      { w: "PROPHET", h: "A messenger sent by Allah to guide humanity" },
+      { w: "MASJID", h: "Place of worship and community gathering" },
+      { w: "SUHOOR", h: "Pre-dawn meal eaten before starting the fast" },
+      { w: "IFTAR", h: "The evening meal eaten to break the fast at sunset" }
+    ],
     soccer: [
       { w: "PENALTY", h: "A free kick taken right in front of the goal" },
       { w: "STRIKER", h: "The player whose main job is to score goals" },
@@ -408,15 +417,10 @@
       { w: "JEDO", h: "The loving grandfather!" },
       { w: "TETA", h: "The caring grandmother!" },
       { w: "COUSINS", h: "Family connected between US, Turkey, & Lebanon" }
-    ],
-    movies: [
-      { w: "AVENGERS", h: "Marvel's premier superhero squad" },
-      { w: "INCEPTION", h: "Mind-bending dream movie" },
-      { w: "STARWARS", h: "In a galaxy far, far away..." }
     ]
   };
 
-  let currentCategory = 'soccer';
+  let currentCategory = 'islamic';
   let curHangItem = {};
   let guessedLetters = [];
   let lives = 6;
