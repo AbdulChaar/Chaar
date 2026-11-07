@@ -37,7 +37,6 @@
       text-align: center; 
       margin-bottom: 12px; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
-      position: relative;
     }
     header h1 { font-size: 1.5rem; margin-bottom: 4px; }
     header p { font-size: 0.85rem; opacity: 0.9; }
@@ -53,7 +52,7 @@
     
     /* Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.7); color: #444; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .tab-btn { flex: 1; min-width: 65px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.7); color: #444; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
     .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(43,88,118,0.3); }
     
     .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.08); margin-bottom: 12px; backdrop-filter: blur(8px); }
@@ -83,6 +82,12 @@
     .c4-cell { aspect-ratio: 1; background: white; border-radius: 50%; cursor: pointer; }
     .c4-cell.red { background: #ef4444; }
     .c4-cell.yellow { background: #eab308; }
+    
+    /* Hangman & Educational UI */
+    .word-display { font-size: 1.8rem; letter-spacing: 8px; margin: 15px 0; font-weight: bold; text-align: center; color: var(--primary); }
+    .keyboard-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+    .key-btn { width: 32px; height: 36px; border: 1px solid #cbd5e1; background: white; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .key-btn.used { background: #cbd5e1; cursor: not-allowed; opacity: 0.5; }
     
     .btn { padding: 8px 14px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
     .btn-secondary { background: #64748b; }
@@ -132,7 +137,8 @@
     <button class="tab-btn active" onclick="showTab('family')">Family</button>
     <button class="tab-btn" onclick="showTab('draw')">Draw</button>
     <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe</button>
-    <button class="tab-btn" onclick="showTab('connect4')">Connect 4</button>
+    <button class="tab-btn" onclick="showTab('hangman')">Hangman</button>
+    <button class="tab-btn" onclick="showTab('math')">Math Fun</button>
     <button class="tab-btn" onclick="showTab('memory')">Memory</button>
   </div>
 
@@ -179,12 +185,21 @@
     <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetTic(true)">Reset Board</button></div>
   </div>
 
-  <!-- CONNECT 4 -->
-  <div id="tab-connect4" class="card" style="display:none;">
-    <h3>Connect 4</h3>
-    <div class="status-text" id="c4Status">Turn: Red 🔴</div>
-    <div class="board-grid-c4" id="c4Board"></div>
-    <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetC4(true)">Reset Board</button></div>
+  <!-- HANGMAN GAME -->
+  <div id="tab-hangman" class="card" style="display:none;">
+    <h3>Family Word Guess</h3>
+    <div class="status-text" id="hangmanStatus">Lives Remaining: ❤️❤️❤️❤️❤️❤️</div>
+    <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+    <div class="keyboard-grid" id="hangmanKeyboard"></div>
+    <div style="text-align:center; margin-top:15px;"><button class="btn btn-secondary" onclick="resetHangman()">Next Word</button></div>
+  </div>
+
+  <!-- MATH FUN EDUCATIONAL GAME -->
+  <div id="tab-math" class="card" style="display:none;">
+    <h3>Math Challenge 🧠</h3>
+    <div class="status-text" id="mathScore">Score: 0</div>
+    <div style="font-size: 2.2rem; font-weight: bold; text-align: center; margin: 15px 0; color: var(--primary);" id="mathProblem">5 + 3 = ?</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 240px; margin: 0 auto;" id="mathOptions"></div>
   </div>
 
   <!-- MEMORY MATCH -->
@@ -197,7 +212,7 @@
 </div>
 
 <script>
-  // Firebase configuration
+  // Firebase Configuration
   const firebaseConfig = {
     apiKey: "AIzaSyBvUCpwqDe9VwDnuLo3EP34BbTEFljqjfs",
     authDomain: "fouad-n-family.firebaseapp.com",
@@ -236,6 +251,13 @@
       osc.start();
       osc.stop(audioCtx.currentTime + duration);
     } catch(e) {}
+  }
+
+  function playVictorySound() {
+    const fanfare = [523.25, 659.25, 783.99, 1046.50];
+    fanfare.forEach((f, idx) => {
+      setTimeout(() => playTone(f, 'triangle', 0.25), idx * 120);
+    });
   }
 
   function toggleMusic() {
@@ -310,7 +332,7 @@
     }
   }
 
-  // --- FIREBASE ROOM & REALTIME SYNC ---
+  // --- FIREBASE ROOM CONNECTION ---
   function connectRoom() {
     currentRoom = document.getElementById('roomCode').value.trim() || "1234";
     roomRef = db.ref('rooms/' + currentRoom);
@@ -321,7 +343,7 @@
   function listenToRoom() {
     if (!roomRef) return;
     
-    // Sync Voice Notes
+    // Voice sync
     roomRef.child('voice_notes').limitToLast(1).on('child_added', snapshot => {
       const data = snapshot.val();
       if (data && data.audio) {
@@ -330,19 +352,13 @@
       }
     });
 
-    // Sync Tic-Tac-Toe
+    // Tic-Tac-Toe sync
     roomRef.child('tic').on('value', snapshot => {
       const data = snapshot.val();
       if (data) { boardTic = data.board || Array(9).fill(''); turnTic = data.turn || '❌'; updateTicUI(); }
     });
 
-    // Sync Connect 4
-    roomRef.child('c4').on('value', snapshot => {
-      const data = snapshot.val();
-      if (data) { boardC4 = data.board || Array(42).fill(''); turnC4 = data.turn || 'red'; updateC4UI(); }
-    });
-
-    // Sync Drawing
+    // Canvas sync
     roomRef.child('draw').on('child_added', snapshot => {
       const pt = snapshot.val();
       if (pt && ctx) drawLine(pt.x0, pt.y0, pt.x1, pt.y1, pt.color);
@@ -355,13 +371,14 @@
 
   // --- TABS NAVIGATION ---
   function showTab(name) {
-    ['family', 'draw', 'tictactoe', 'connect4', 'memory'].forEach(t => {
+    ['family', 'draw', 'tictactoe', 'hangman', 'math', 'memory'].forEach(t => {
       document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
     if(name === 'draw') setTimeout(initCanvas, 50);
-    if(name === 'connect4') initC4Board();
+    if(name === 'hangman') resetHangman();
+    if(name === 'math') nextMathProblem();
     if(name === 'memory') resetMem();
   }
 
@@ -412,70 +429,147 @@
     if(broadcast && roomRef) { roomRef.child('draw').remove(); roomRef.child('draw_clear').set(Date.now()); }
   }
 
-  // --- TIC TAC TOE ---
+  // --- TIC TAC TOE WITH WIN SOUND ---
   let boardTic = Array(9).fill('');
   let turnTic = '❌';
+
   function playTic(i) {
     if(!boardTic[i]) {
       boardTic[i] = turnTic;
-      turnTic = (turnTic === '❌') ? '⭕' : '❌';
-      updateTicUI();
       playTone(400, 'square', 0.1);
+      
+      if (checkTicWin(turnTic)) {
+        document.getElementById('ticStatus').innerText = "🎉 Player " + turnTic + " Wins!";
+        playVictorySound();
+      } else {
+        turnTic = (turnTic === '❌') ? '⭕' : '❌';
+        document.getElementById('ticStatus').innerText = "Current Turn: " + turnTic;
+      }
+      
+      updateTicUI();
       if(roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic });
     }
   }
+
+  function checkTicWin(p) {
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    return wins.some(w => w.every(idx => boardTic[idx] === p));
+  }
+
   function updateTicUI() {
     Array.from(document.querySelectorAll('#tab-tictactoe .cell')).forEach((c, idx) => c.innerText = boardTic[idx] || '');
-    document.getElementById('ticStatus').innerText = "Current Turn: " + turnTic;
   }
-  function resetTic(b) { boardTic.fill(''); turnTic = '❌'; updateTicUI(); if(b && roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic }); }
 
-  // --- CONNECT 4 ---
-  let boardC4 = Array(42).fill('');
-  let turnC4 = 'red';
-  function initC4Board() {
-    const b = document.getElementById('c4Board');
-    if(b.children.length > 0) return;
-    b.innerHTML = '';
-    for(let i=0; i<42; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'c4-cell';
-      cell.onclick = () => dropC4(i % 7);
-      b.appendChild(cell);
-    }
+  function resetTic(b) { 
+    boardTic.fill(''); 
+    turnTic = '❌'; 
+    document.getElementById('ticStatus').innerText = "Current Turn: ❌";
+    updateTicUI(); 
+    if(b && roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic }); 
   }
-  function dropC4(col) {
-    for(let r=5; r>=0; r--) {
-      let idx = r * 7 + col;
-      if(!boardC4[idx]) {
-        boardC4[idx] = turnC4;
-        turnC4 = (turnC4 === 'red') ? 'yellow' : 'red';
-        updateC4UI();
-        playTone(300, 'sine', 0.12);
-        if(roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 });
-        break;
-      }
-    }
+
+  // --- HANGMAN GAME ---
+  const words = ["BEIRUT", "DALLAS", "ISTANBUL", "SOCCER", "JEDO", "TETA", "TURKEY", "FAMILY"];
+  let currentWord = "", guessedLetters = [], lives = 6;
+
+  function resetHangman() {
+    currentWord = words[Math.floor(Math.random() * words.length)];
+    guessedLetters = [];
+    lives = 6;
+    renderHangman();
   }
-  function updateC4UI() {
-    initC4Board();
-    const cells = document.querySelectorAll('.c4-cell');
-    boardC4.forEach((val, i) => {
-      cells[i].className = 'c4-cell ' + (val || '');
+
+  function renderHangman() {
+    document.getElementById('hangmanStatus').innerText = "Lives Remaining: " + "❤️".repeat(lives);
+    let display = "";
+    for(let char of currentWord) {
+      display += guessedLetters.includes(char) ? char + " " : "_ ";
+    }
+    document.getElementById('wordDisplay').innerText = display;
+
+    const kb = document.getElementById('hangmanKeyboard');
+    kb.innerHTML = "";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(let => {
+      const btn = document.createElement('button');
+      btn.className = "key-btn" + (guessedLetters.includes(let) ? " used" : "");
+      btn.innerText = let;
+      btn.onclick = () => guessLetter(let);
+      kb.appendChild(btn);
     });
-    document.getElementById('c4Status').innerText = "Turn: " + (turnC4 === 'red' ? 'Red 🔴' : 'Yellow 🟡');
+
+    if(!display.includes("_")) {
+      document.getElementById('hangmanStatus').innerText = "🎉 Word Cleared!";
+      playVictorySound();
+    } else if(lives <= 0) {
+      document.getElementById('hangmanStatus').innerText = "❌ Game Over! Word was: " + currentWord;
+    }
   }
-  function resetC4(b) { boardC4.fill(''); turnC4 = 'red'; updateC4UI(); if(b && roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 }); }
+
+  function guessLetter(l) {
+    if(!guessedLetters.includes(l) && lives > 0) {
+      guessedLetters.push(l);
+      if(!currentWord.includes(l)) {
+        lives--;
+        playTone(200, 'sawtooth', 0.2);
+      } else {
+        playTone(600, 'sine', 0.1);
+      }
+      renderHangman();
+    }
+  }
+
+  // --- EDUCATIONAL MATH GAME ---
+  let mathAns = 0, mathScore = 0;
+
+  function nextMathProblem() {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const isPlus = Math.random() > 0.3;
+    
+    if(isPlus) {
+      mathAns = num1 + num2;
+      document.getElementById('mathProblem').innerText = `${num1} + ${num2} = ?`;
+    } else {
+      const max = Math.max(num1, num2);
+      const min = Math.min(num1, num2);
+      mathAns = max - min;
+      document.getElementById('mathProblem').innerText = `${max} - ${min} = ?`;
+    }
+
+    const optsDiv = document.getElementById('mathOptions');
+    optsDiv.innerHTML = "";
+    
+    let choices = [mathAns, mathAns + 1, mathAns - 1, mathAns + 2].sort(() => Math.random() - 0.5);
+    choices.forEach(c => {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.style.fontSize = '1.2rem';
+      btn.style.padding = '12px';
+      btn.innerText = c;
+      btn.onclick = () => {
+        if(c === mathAns) {
+          mathScore++;
+          playTone(800, 'sine', 0.15);
+          nextMathProblem();
+        } else {
+          playTone(220, 'sawtooth', 0.2);
+        }
+        document.getElementById('mathScore').innerText = "Score: " + mathScore;
+      };
+      optsDiv.appendChild(btn);
+    });
+  }
 
   // --- MEMORY GAME ---
   const memIcons = ['⚽', '⚽', '🎨', '🎨', '✈️', '✈️', '🇱🇧', '🇱🇧', '🇹🇷', '🇹🇷', '👴', '👴'];
   let flipped = [], matched = 0;
+
   function resetMem() {
     const b = document.getElementById('memBoard');
     b.innerHTML = '';
     flipped = []; matched = 0;
     const shuffled = [...memIcons].sort(() => Math.random() - 0.5);
-    shuffled.forEach((icon, i) => {
+    shuffled.forEach((icon) => {
       const card = document.createElement('div');
       card.className = 'cell';
       card.dataset.icon = icon;
@@ -485,6 +579,7 @@
     });
     document.getElementById('memStatus').innerText = "Find matching pairs!";
   }
+
   function flipMem(card) {
     if(flipped.length < 2 && card.innerText === '❓') {
       card.innerText = card.dataset.icon;
@@ -495,12 +590,17 @@
           matched += 2;
           flipped = [];
           playTone(800, 'triangle', 0.2);
-          if(matched === memIcons.length) document.getElementById('memStatus').innerText = "🎉 You matched them all!";
+          if(matched === memIcons.length) {
+            document.getElementById('memStatus').innerText = "🎉 You matched them all!";
+            playVictorySound();
+          }
         } else {
           setTimeout(() => {
-            flipped[0].innerText = '❓';
-            flipped[1].innerText = '❓';
-            flipped = [];
+            if(flipped.length === 2) {
+              flipped[0].innerText = '❓';
+              flipped[1].innerText = '❓';
+              flipped = [];
+            }
           }, 800);
         }
       }
