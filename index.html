@@ -51,7 +51,7 @@
     
     /* Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { flex: 1; min-width: 80px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
     .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
     
     .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); margin-bottom: 12px; }
@@ -83,6 +83,16 @@
     .c4-cell { aspect-ratio: 1; background: white; border-radius: 50%; cursor: pointer; }
     .c4-cell.red { background: #ef4444; }
     .c4-cell.yellow { background: #eab308; }
+
+    /* Hangman Studio Styling */
+    .subject-selector { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; flex-wrap: wrap; }
+    .subj-btn { padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 20px; background: white; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+    .subj-btn.active { background: var(--secondary); color: white; border-color: var(--secondary); }
+    .word-display { font-size: 1.8rem; letter-spacing: 6px; margin: 15px 0; font-weight: bold; text-align: center; color: var(--primary); }
+    .keyboard-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 10px; }
+    .key-btn { width: 32px; height: 36px; border: 1px solid #cbd5e1; background: white; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .key-btn.used { background: #cbd5e1; cursor: not-allowed; opacity: 0.5; }
+    .hint-box { font-size: 0.85rem; color: #475569; background: #f1f5f9; padding: 8px; border-radius: 8px; text-align: center; margin: 8px 0; }
 
     .btn { padding: 9px 16px; border: none; border-radius: 8px; background: var(--secondary); color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
     .btn-secondary { background: #64748b; }
@@ -128,9 +138,10 @@
   <!-- NAVIGATION TABS -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('family')">Profile</button>
-    <button class="tab-btn" onclick="showTab('puzzle')">Slider Puzzle 🧩</button>
-    <button class="tab-btn" onclick="showTab('connect4')">Connect 4 🟡</button>
+    <button class="tab-btn" onclick="showTab('hangman')">Hangman 🔤</button>
+    <button class="tab-btn" onclick="showTab('puzzle')">Puzzle 🧩</button>
     <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe ❌</button>
+    <button class="tab-btn" onclick="showTab('connect4')">Connect 4 🟡</button>
     <button class="tab-btn" onclick="showTab('draw')">Draw 🎨</button>
   </div>
 
@@ -149,7 +160,26 @@
     </div>
   </div>
 
-  <!-- ENHANCED SLIDING PUZZLE -->
+  <!-- HANGMAN STUDIO -->
+  <div id="tab-hangman" class="card" style="display:none;">
+    <h3>Hangman Studio 🔤</h3>
+    <div class="subject-selector">
+      <button class="subj-btn active" onclick="setSubject('soccer')">⚽ Soccer</button>
+      <button class="subj-btn" onclick="setSubject('cities')">🌍 World Cities</button>
+      <button class="subj-btn" onclick="setSubject('family')">❤️ Family</button>
+      <button class="subj-btn" onclick="setSubject('movies')">🎬 Movies</button>
+    </div>
+    <div class="status-text" id="hangmanStatus">Lives Remaining: ❤️❤️❤️❤️❤️❤️</div>
+    <div class="word-display" id="wordDisplay">_ _ _ _ _</div>
+    <div class="hint-box" id="hintBox">💡 Tap "Get Hint" for a clue!</div>
+    <div style="text-align:center; margin-bottom:8px;">
+      <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="showHint()">💡 Get Hint</button>
+    </div>
+    <div class="keyboard-grid" id="hangmanKeyboard"></div>
+    <div style="text-align:center; margin-top:12px;"><button class="btn btn-secondary" onclick="resetHangman()">Next Word</button></div>
+  </div>
+
+  <!-- SLIDING PUZZLE -->
   <div id="tab-puzzle" class="card" style="display:none;">
     <h3>Pro Sliding Tile Challenge 🧩</h3>
     <div class="status-text" id="puzzleStatus">Moves: 0 | Target: Arrange 1 to 8</div>
@@ -164,7 +194,8 @@
   <!-- CONNECT 4 -->
   <div id="tab-connect4" class="card" style="display:none;">
     <h3>Connect 4 Arena 🟡🔴</h3>
-    <div class="status-text" id="c4Status">Turn: Red 🔴</div>
+    <p style="font-size:0.8rem; text-align:center; color:#666;">Tap any column to drop your token to the bottom!</p>
+    <div class="status-text" id="c4Status" style="margin-top:6px;">Turn: Red 🔴</div>
     <div class="board-grid-c4" id="c4Board"></div>
     <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetC4(true)">Reset Board</button></div>
   </div>
@@ -341,12 +372,13 @@
 
   // --- TAB ROUTING ---
   function showTab(name) {
-    ['family', 'puzzle', 'connect4', 'tictactoe', 'draw'].forEach(t => {
+    ['family', 'hangman', 'puzzle', 'tictactoe', 'connect4', 'draw'].forEach(t => {
       document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
     if(name === 'draw') setTimeout(initCanvas, 50);
+    if(name === 'hangman') resetHangman();
     if(name === 'puzzle') shufflePuzzle();
     if(name === 'connect4') initC4Board();
   }
@@ -355,6 +387,98 @@
     document.querySelectorAll('.avatar-card').forEach(a => a.classList.remove('selected'));
     el.classList.add('selected');
     playTone(523.25, 'sine', 0.1);
+  }
+
+  // --- HANGMAN STUDIO WITH CATEGORIES & HINTS ---
+  const hangmanData = {
+    soccer: [
+      { w: "PENALTY", h: "A free kick taken right in front of the goal" },
+      { w: "STRIKER", h: "The player whose main job is to score goals" },
+      { w: "RONALDO", h: "Famous Portuguese #7 football legend" },
+      { w: "MESSI", h: "Argentine World Cup winner" },
+      { w: "DRIBBLE", h: "Moving the ball past opponents with quick footwork" }
+    ],
+    cities: [
+      { w: "DALLAS", h: "Famous Texas city home to Fouad, Zayd, & Majd!" },
+      { w: "BEIRUT", h: "The beautiful capital city of Lebanon" },
+      { w: "ISTANBUL", h: "Historic city straddling Europe & Asia" },
+      { w: "STLOUIS", h: "Famous Gateway Arch city in Missouri" }
+    ],
+    family: [
+      { w: "JEDO", h: "The loving grandfather!" },
+      { w: "TETA", h: "The caring grandmother!" },
+      { w: "COUSINS", h: "Family connected between US, Turkey, & Lebanon" }
+    ],
+    movies: [
+      { w: "AVENGERS", h: "Marvel's premier superhero squad" },
+      { w: "INCEPTION", h: "Mind-bending dream movie" },
+      { w: "STARWARS", h: "In a galaxy far, far away..." }
+    ]
+  };
+
+  let currentCategory = 'soccer';
+  let curHangItem = {};
+  let guessedLetters = [];
+  let lives = 6;
+
+  function setSubject(sub) {
+    currentCategory = sub;
+    document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    resetHangman();
+  }
+
+  function resetHangman() {
+    const list = hangmanData[currentCategory];
+    curHangItem = list[Math.floor(Math.random() * list.length)];
+    guessedLetters = [];
+    lives = 6;
+    document.getElementById('hintBox').innerText = '💡 Tap "Get Hint" for a clue!';
+    renderHangman();
+  }
+
+  function showHint() {
+    document.getElementById('hintBox').innerText = "💡 Clue: " + curHangItem.h;
+    playTone(700, 'sine', 0.1);
+  }
+
+  function renderHangman() {
+    document.getElementById('hangmanStatus').innerText = "Lives Remaining: " + "❤️".repeat(lives);
+    let display = "";
+    for(let char of curHangItem.w) {
+      display += guessedLetters.includes(char) ? char + " " : "_ ";
+    }
+    document.getElementById('wordDisplay').innerText = display;
+
+    const kb = document.getElementById('hangmanKeyboard');
+    kb.innerHTML = "";
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(let => {
+      const btn = document.createElement('button');
+      btn.className = "key-btn" + (guessedLetters.includes(let) ? " used" : "");
+      btn.innerText = let;
+      btn.onclick = () => guessLetter(let);
+      kb.appendChild(btn);
+    });
+
+    if(!display.includes("_")) {
+      document.getElementById('hangmanStatus').innerText = "🎉 Word Cleared!";
+      playVictorySound();
+    } else if(lives <= 0) {
+      document.getElementById('hangmanStatus').innerText = "❌ Game Over! Word was: " + curHangItem.w;
+    }
+  }
+
+  function guessLetter(l) {
+    if(!guessedLetters.includes(l) && lives > 0) {
+      guessedLetters.push(l);
+      if(!curHangItem.w.includes(l)) {
+        lives--;
+        playTone(200, 'sawtooth', 0.2);
+      } else {
+        playTone(600, 'sine', 0.1);
+      }
+      renderHangman();
+    }
   }
 
   // --- PRO SLIDING PUZZLE ---
@@ -398,9 +522,7 @@
     const emptyRow = Math.floor(emptyIdx / puzzleSize);
     const emptyCol = emptyIdx % puzzleSize;
 
-    const isAdjacent = (Math.abs(row - emptyRow) + Math.abs(col - emptyCol)) === 1;
-
-    if (isAdjacent) {
+    if ((Math.abs(row - emptyRow) + Math.abs(col - emptyCol)) === 1) {
       puzzleTiles[emptyIdx] = puzzleTiles[idx];
       puzzleTiles[idx] = "";
       puzzleMoves++;
