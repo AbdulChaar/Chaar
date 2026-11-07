@@ -10,7 +10,7 @@
   <style>
     :root {
       --primary: #1e3a8a;
-      --secondary: #3b82f6;
+      --secondary: #2563eb;
       --accent: #10b981;
       --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       --card-bg: rgba(255, 255, 255, 0.95);
@@ -51,8 +51,8 @@
     
     /* Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-    .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.4); }
+    .tab-btn { flex: 1; min-width: 80px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
     
     .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); margin-bottom: 12px; }
 
@@ -71,23 +71,18 @@
     /* Canvas */
     canvas { border: 2px dashed #cbd5e1; border-radius: 12px; width: 100%; height: 280px; background: white; touch-action: none; }
 
-    /* Soccer Game Styling */
-    .soccer-field { width: 100%; height: 260px; background: #15803d; border-radius: 12px; border: 3px solid white; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 10px 0; }
-    .goal-post { width: 160px; height: 60px; border: 4px solid white; border-bottom: none; background: rgba(255,255,255,0.15); position: relative; }
-    .keeper { font-size: 2rem; position: absolute; bottom: 0; left: 65px; transition: left 0.3s ease; }
-    .ball { font-size: 2.2rem; cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-    
-    /* Lego Builder Styling */
-    .lego-palette { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
-    .lego-color { width: 32px; height: 32px; border-radius: 6px; cursor: pointer; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .lego-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; max-width: 320px; margin: 0 auto; background: #cbd5e1; padding: 4px; border-radius: 8px; }
-    .lego-stud { aspect-ratio: 1; background: #e2e8f0; border-radius: 4px; cursor: pointer; position: relative; }
-    .lego-stud::after { content: ''; position: absolute; top: 25%; left: 25%; width: 50%; height: 50%; background: rgba(0,0,0,0.1); border-radius: 50%; }
-
     /* Puzzle Styling */
-    .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 270px; margin: 15px auto; background: #334155; padding: 6px; border-radius: 10px; }
-    .puzzle-tile { aspect-ratio: 1; background: #3b82f6; color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; user-select: none; }
-    .puzzle-tile.empty { background: transparent; cursor: default; }
+    .puzzle-grid { display: grid; gap: 4px; max-width: 300px; margin: 15px auto; background: #1e293b; padding: 8px; border-radius: 12px; }
+    .puzzle-grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .puzzle-grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .puzzle-tile { aspect-ratio: 1; background: var(--secondary); color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .puzzle-tile.empty { background: transparent; box-shadow: none; cursor: default; }
+
+    /* Connect 4 Styling */
+    .board-grid-c4 { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; max-width: 320px; margin: 15px auto; background: #1e3a8a; padding: 10px; border-radius: 12px; }
+    .c4-cell { aspect-ratio: 1; background: white; border-radius: 50%; cursor: pointer; }
+    .c4-cell.red { background: #ef4444; }
+    .c4-cell.yellow { background: #eab308; }
 
     .btn { padding: 9px 16px; border: none; border-radius: 8px; background: var(--secondary); color: white; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
     .btn-secondary { background: #64748b; }
@@ -105,13 +100,12 @@
   <!-- UTILITY & WALLPAPER BAR -->
   <div class="utility-bar">
     <div class="theme-selector">
-      <button class="theme-btn" style="background: linear-gradient(135deg, #0f172a, #1e293b);" onclick="setTheme('dark')" title="Dark Stadium"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #15803d, #4ade80);" onclick="setTheme('pitch')" title="Pitch Green"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #0f172a, #1e293b);" onclick="setTheme('dark')" title="Dark Mode"></button>
       <button class="theme-btn" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6);" onclick="setTheme('blue')" title="Ocean Blue"></button>
-      <button class="theme-btn" style="background: linear-gradient(135deg, #b91c1c, #f87171);" onclick="setTheme('red')" title="Champions Red"></button>
+      <button class="theme-btn" style="background: linear-gradient(135deg, #15803d, #4ade80);" onclick="setTheme('green')" title="Emerald"></button>
     </div>
     <div>
-      <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()">🎵 Music: OFF</button>
+      <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()">⚡ Music: OFF</button>
     </div>
   </div>
 
@@ -134,11 +128,10 @@
   <!-- NAVIGATION TABS -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('family')">Profile</button>
-    <button class="tab-btn" onclick="showTab('soccer')">Soccer Shootout ⚽</button>
-    <button class="tab-btn" onclick="showTab('lego')">Lego Builder 🧱</button>
-    <button class="tab-btn" onclick="showTab('puzzle')">Sliding Puzzle 🧩</button>
+    <button class="tab-btn" onclick="showTab('puzzle')">Slider Puzzle 🧩</button>
+    <button class="tab-btn" onclick="showTab('connect4')">Connect 4 🟡</button>
+    <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe ❌</button>
     <button class="tab-btn" onclick="showTab('draw')">Draw 🎨</button>
-    <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe</button>
   </div>
 
   <!-- FAMILY PROFILE TAB -->
@@ -156,55 +149,29 @@
     </div>
   </div>
 
-  <!-- SOCCER PENALTY SHOOTOUT -->
-  <div id="tab-soccer" class="card" style="display:none;">
-    <h3>Penalty Shootout Arena ⚽</h3>
-    <div class="status-text" id="soccerStatus">Tap the Ball to Kick! Goals Scored: 0</div>
-    <div class="soccer-field">
-      <div class="goal-post">
-        <div class="keeper" id="keeper">🧤</div>
-      </div>
-      <div class="ball" id="soccerBall" onclick="kickBall()">⚽</div>
-    </div>
-  </div>
-
-  <!-- LEGO BRICK BUILDER -->
-  <div id="tab-lego" class="card" style="display:none;">
-    <h3>Shared Lego Studio 🧱</h3>
-    <p style="font-size:0.8rem; text-align:center; margin-bottom:8px;">Build structures live across Dallas & Lebanon!</p>
-    <div class="lego-palette">
-      <div class="lego-color" style="background:#ef4444;" onclick="setLegoColor('#ef4444')"></div>
-      <div class="lego-color" style="background:#3b82f6;" onclick="setLegoColor('#3b82f6')"></div>
-      <div class="lego-color" style="background:#eab308;" onclick="setLegoColor('#eab308')"></div>
-      <div class="lego-color" style="background:#22c55e;" onclick="setLegoColor('#22c55e')"></div>
-      <div class="lego-color" style="background:#a855f7;" onclick="setLegoColor('#a855f7')"></div>
-      <div class="lego-color" style="background:#e2e8f0;" onclick="setLegoColor('#e2e8f0')"></div>
-    </div>
-    <div class="lego-grid" id="legoGrid"></div>
-    <div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" onclick="resetLego(true)">Clear Baseplate</button></div>
-  </div>
-
-  <!-- SLIDING JIGSAW PUZZLE -->
+  <!-- ENHANCED SLIDING PUZZLE -->
   <div id="tab-puzzle" class="card" style="display:none;">
-    <h3>Sports & Travel Slider Puzzle 🧩</h3>
-    <div class="status-text" id="puzzleStatus">Slide tiles to match 1 to 8!</div>
-    <div class="puzzle-grid" id="puzzleGrid"></div>
-    <div style="text-align:center;"><button class="btn btn-secondary" onclick="initPuzzle()">Shuffle Puzzle</button></div>
+    <h3>Pro Sliding Tile Challenge 🧩</h3>
+    <div class="status-text" id="puzzleStatus">Moves: 0 | Target: Arrange 1 to 8</div>
+    <div style="text-align:center; margin-bottom:10px;">
+      <button class="btn" style="padding:4px 10px; font-size:0.75rem;" onclick="setPuzzleMode(3)">3x3 Mode</button>
+      <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="setPuzzleMode(4)">4x4 Mode</button>
+    </div>
+    <div class="puzzle-grid puzzle-grid-3" id="puzzleGrid"></div>
+    <div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" onclick="shufflePuzzle()">Shuffle Tiles</button></div>
   </div>
 
-  <!-- DRAWING TAB -->
-  <div id="tab-draw" class="card" style="display:none;">
-    <h3>Family Touch Canvas</h3>
-    <canvas id="paintCanvas"></canvas>
-    <div class="controls">
-      <input type="color" id="colorPicker" value="#ff7e5f">
-      <button class="btn btn-secondary" onclick="clearCanvas(true)">Clear</button>
-    </div>
+  <!-- CONNECT 4 -->
+  <div id="tab-connect4" class="card" style="display:none;">
+    <h3>Connect 4 Arena 🟡🔴</h3>
+    <div class="status-text" id="c4Status">Turn: Red 🔴</div>
+    <div class="board-grid-c4" id="c4Board"></div>
+    <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetC4(true)">Reset Board</button></div>
   </div>
 
   <!-- TIC TAC TOE -->
   <div id="tab-tictactoe" class="card" style="display:none;">
-    <h3>Tic-Tac-Toe Arena</h3>
+    <h3>Tic-Tac-Toe Arena ❌⭕</h3>
     <div class="status-text" id="ticStatus">Current Turn: ❌</div>
     <div class="board-grid-3" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; max-width:260px; margin:15px auto;">
       <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(0)"></div>
@@ -218,6 +185,16 @@
       <div class="cell" style="aspect-ratio:1; background:#f8fafc; border-radius:10px; font-size:2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;" onclick="playTic(8)"></div>
     </div>
     <div style="text-align:center;"><button class="btn btn-secondary" onclick="resetTic(true)">Reset Board</button></div>
+  </div>
+
+  <!-- DRAWING TAB -->
+  <div id="tab-draw" class="card" style="display:none;">
+    <h3>Family Touch Canvas 🎨</h3>
+    <canvas id="paintCanvas"></canvas>
+    <div class="controls" style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+      <input type="color" id="colorPicker" value="#ff7e5f">
+      <button class="btn btn-secondary" onclick="clearCanvas(true)">Clear</button>
+    </div>
   </div>
 </div>
 
@@ -238,23 +215,23 @@
   let roomRef = null;
   let currentRoom = "1234";
 
-  // --- AUDIO SYNTHESIS & SOUNDS ---
+  // --- AUDIO SYNTHESIS ---
   let audioCtx = null;
   let isMusicPlaying = false;
-  let musicInterval = null;
+  let musicTimer = null;
 
   function initAudio() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  function playTone(freq, type = 'sine', duration = 0.15) {
+  function playTone(freq, type = 'sine', duration = 0.12, vol = 0.1) {
     try {
       initAudio();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -265,7 +242,7 @@
 
   function playVictorySound() {
     const fanfare = [523.25, 659.25, 783.99, 1046.50];
-    fanfare.forEach((f, idx) => setTimeout(() => playTone(f, 'triangle', 0.25), idx * 120));
+    fanfare.forEach((f, idx) => setTimeout(() => playTone(f, 'triangle', 0.25, 0.15), idx * 120));
   }
 
   function toggleMusic() {
@@ -273,55 +250,50 @@
     isMusicPlaying = !isMusicPlaying;
     const btn = document.getElementById('musicBtn');
     if (isMusicPlaying) {
-      btn.innerText = "🎵 Music: ON";
-      const notes = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23];
+      btn.innerText = "⚡ Music: ON";
+      const melody = [329.63, 329.63, 0, 329.63, 0, 261.63, 329.63, 0, 392.00, 0, 0, 0, 196.00];
       let step = 0;
-      musicInterval = setInterval(() => {
-        playTone(notes[step % notes.length], 'sine', 0.4);
+      musicTimer = setInterval(() => {
+        const note = melody[step % melody.length];
+        if (note > 0) playTone(note, 'square', 0.12, 0.04);
         step++;
-      }, 600);
+      }, 160);
     } else {
-      btn.innerText = "🎵 Music: OFF";
-      clearInterval(musicInterval);
+      btn.innerText = "⚡ Music: OFF";
+      clearInterval(musicTimer);
     }
   }
 
   function setTheme(theme) {
     const gradients = {
       dark: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      pitch: 'linear-gradient(135deg, #15803d 0%, #4ade80 100%)',
       blue: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-      red: 'linear-gradient(135deg, #b91c1c 0%, #f87171 100%)'
+      green: 'linear-gradient(135deg, #15803d 0%, #4ade80 100%)'
     };
     document.body.style.background = gradients[theme] || gradients.dark;
     playTone(440, 'triangle', 0.1);
   }
 
   // --- VOICE MESSAGES ---
-  let mediaRecorder = null;
-  let audioChunks = [];
-
+  let mediaRecorder = null, audioChunks = [];
   function startVoiceRecording() {
     initAudio();
     document.getElementById('voiceStatus').innerText = "🎙️ Recording... Release button to send!";
     document.getElementById('voiceStatus').style.color = "#ef4444";
     audioChunks = [];
-
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(audioChunks, { type: 'audio/webm' });
-          const reader = new FileReader();
-          reader.readAsDataURL(blob);
-          reader.onloadend = () => {
-            if (roomRef) roomRef.child('voice_notes').push({ audio: reader.result, timestamp: Date.now() });
-          };
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          if (roomRef) roomRef.child('voice_notes').push({ audio: reader.result, timestamp: Date.now() });
         };
-        mediaRecorder.start();
-      })
-      .catch(err => { document.getElementById('voiceStatus').innerText = "Microphone access denied."; });
+      };
+      mediaRecorder.start();
+    }).catch(() => { document.getElementById('voiceStatus').innerText = "Microphone access denied."; });
   }
 
   function stopVoiceRecording() {
@@ -343,8 +315,6 @@
 
   function listenToRoom() {
     if (!roomRef) return;
-    
-    // Voice sync
     roomRef.child('voice_notes').limitToLast(1).on('child_added', snapshot => {
       const data = snapshot.val();
       if (data && data.audio) {
@@ -352,22 +322,16 @@
       }
     });
 
-    // Lego sync
-    roomRef.child('lego').on('value', snapshot => {
+    roomRef.child('c4').on('value', snapshot => {
       const data = snapshot.val();
-      if (data) {
-        legoBoard = data;
-        renderLegoBoard();
-      }
+      if (data) { boardC4 = data.board || Array(42).fill(''); turnC4 = data.turn || 'red'; updateC4UI(); }
     });
 
-    // Tic-Tac-Toe sync
     roomRef.child('tic').on('value', snapshot => {
       const data = snapshot.val();
       if (data) { boardTic = data.board || Array(9).fill(''); turnTic = data.turn || '❌'; updateTicUI(); }
     });
 
-    // Canvas sync
     roomRef.child('draw').on('child_added', snapshot => {
       const pt = snapshot.val();
       if (pt && ctx) drawLine(pt.x0, pt.y0, pt.x1, pt.y1, pt.color);
@@ -377,14 +341,14 @@
 
   // --- TAB ROUTING ---
   function showTab(name) {
-    ['family', 'soccer', 'lego', 'puzzle', 'draw', 'tictactoe'].forEach(t => {
+    ['family', 'puzzle', 'connect4', 'tictactoe', 'draw'].forEach(t => {
       document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
     if(name === 'draw') setTimeout(initCanvas, 50);
-    if(name === 'lego') initLegoGrid();
-    if(name === 'puzzle') initPuzzle();
+    if(name === 'puzzle') shufflePuzzle();
+    if(name === 'connect4') initC4Board();
   }
 
   function selectAvatar(el, name) {
@@ -393,86 +357,29 @@
     playTone(523.25, 'sine', 0.1);
   }
 
-  // --- SOCCER PENALTY GAME ---
-  let goalsScored = 0;
-  function kickBall() {
-    const ball = document.getElementById('soccerBall');
-    const keeper = document.getElementById('keeper');
-    
-    // Random shot direction (-60 to +60 px) & Keeper jump (-70 to +70 px)
-    const shotX = (Math.random() - 0.5) * 130;
-    const keeperX = (Math.random() - 0.5) * 130;
-    
-    keeper.style.left = (65 + keeperX) + 'px';
-    ball.style.transform = `translate(${shotX}px, -180px) scale(0.6)`;
-    
-    playTone(350, 'square', 0.15);
+  // --- PRO SLIDING PUZZLE ---
+  let puzzleSize = 3;
+  let puzzleTiles = [];
+  let puzzleMoves = 0;
 
-    setTimeout(() => {
-      if (Math.abs(shotX - keeperX) > 35) {
-        goalsScored++;
-        document.getElementById('soccerStatus').innerText = `⚽ GOAL! Total Goals: ${goalsScored}`;
-        playVictorySound();
-      } else {
-        document.getElementById('soccerStatus').innerText = "🧤 SAVED! Try again!";
-        playTone(180, 'sawtooth', 0.25);
-      }
-
-      setTimeout(() => {
-        ball.style.transform = `translate(0px, 0px) scale(1)`;
-        keeper.style.left = '65px';
-      }, 1000);
-    }, 400);
+  function setPuzzleMode(size) {
+    puzzleSize = size;
+    const grid = document.getElementById('puzzleGrid');
+    grid.className = `puzzle-grid puzzle-grid-${size}`;
+    shufflePuzzle();
   }
 
-  // --- LEGO BRICK BUILDER ---
-  let selectedLegoColor = '#ef4444';
-  let legoBoard = Array(100).fill('#e2e8f0');
-
-  function setLegoColor(color) { selectedLegoColor = color; playTone(600, 'sine', 0.05); }
-
-  function initLegoGrid() {
-    const grid = document.getElementById('legoGrid');
-    if (grid.children.length > 0) return;
-    grid.innerHTML = '';
-    for (let i = 0; i < 100; i++) {
-      const stud = document.createElement('div');
-      stud.className = 'lego-stud';
-      stud.onclick = () => placeLego(i);
-      grid.appendChild(stud);
-    }
-    renderLegoBoard();
-  }
-
-  function placeLego(idx) {
-    legoBoard[idx] = selectedLegoColor;
-    renderLegoBoard();
-    playTone(500, 'square', 0.08);
-    if (roomRef) roomRef.child('lego').set(legoBoard);
-  }
-
-  function renderLegoBoard() {
-    const studs = document.querySelectorAll('.lego-stud');
-    legoBoard.forEach((color, idx) => {
-      if (studs[idx]) studs[idx].style.background = color;
-    });
-  }
-
-  function resetLego(b) {
-    legoBoard = Array(100).fill('#e2e8f0');
-    renderLegoBoard();
-    if (b && roomRef) roomRef.child('lego').set(legoBoard);
-  }
-
-  // --- SLIDING JIGSAW PUZZLE ---
-  let puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, ""];
-
-  function initPuzzle() {
-    puzzleTiles = [1, 2, 3, 4, 5, 6, 7, 8, ""].sort(() => Math.random() - 0.5);
+  function shufflePuzzle() {
+    const count = puzzleSize * puzzleSize;
+    puzzleTiles = Array.from({length: count - 1}, (_, i) => i + 1);
+    puzzleTiles.push("");
+    puzzleTiles.sort(() => Math.random() - 0.5);
+    puzzleMoves = 0;
     renderPuzzle();
   }
 
   function renderPuzzle() {
+    document.getElementById('puzzleStatus').innerText = `Moves: ${puzzleMoves} | Target: 1 to ${puzzleSize * puzzleSize - 1}`;
     const grid = document.getElementById('puzzleGrid');
     grid.innerHTML = '';
     puzzleTiles.forEach((tile, idx) => {
@@ -486,20 +393,68 @@
 
   function movePuzzleTile(idx) {
     const emptyIdx = puzzleTiles.indexOf("");
-    const validMoves = [idx - 1, idx + 1, idx - 3, idx + 3];
-    
-    if (validMoves.includes(emptyIdx)) {
+    const row = Math.floor(idx / puzzleSize);
+    const col = idx % puzzleSize;
+    const emptyRow = Math.floor(emptyIdx / puzzleSize);
+    const emptyCol = emptyIdx % puzzleSize;
+
+    const isAdjacent = (Math.abs(row - emptyRow) + Math.abs(col - emptyCol)) === 1;
+
+    if (isAdjacent) {
       puzzleTiles[emptyIdx] = puzzleTiles[idx];
       puzzleTiles[idx] = "";
+      puzzleMoves++;
       playTone(450, 'sine', 0.1);
       renderPuzzle();
       
-      if (puzzleTiles.join('') === "12345678") {
-        document.getElementById('puzzleStatus').innerText = "🎉 Puzzle Solved!";
+      const target = Array.from({length: puzzleSize * puzzleSize - 1}, (_, i) => i + 1).join('');
+      if (puzzleTiles.slice(0, -1).join('') === target) {
+        document.getElementById('puzzleStatus').innerText = `🎉 Solved in ${puzzleMoves} moves!`;
         playVictorySound();
       }
     }
   }
+
+  // --- CONNECT 4 ---
+  let boardC4 = Array(42).fill('');
+  let turnC4 = 'red';
+
+  function initC4Board() {
+    const b = document.getElementById('c4Board');
+    if(b.children.length > 0) return;
+    b.innerHTML = '';
+    for(let i=0; i<42; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'c4-cell';
+      cell.onclick = () => dropC4(i % 7);
+      b.appendChild(cell);
+    }
+  }
+
+  function dropC4(col) {
+    for(let r=5; r>=0; r--) {
+      let idx = r * 7 + col;
+      if(!boardC4[idx]) {
+        boardC4[idx] = turnC4;
+        turnC4 = (turnC4 === 'red') ? 'yellow' : 'red';
+        updateC4UI();
+        playTone(300, 'sine', 0.12);
+        if(roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 });
+        break;
+      }
+    }
+  }
+
+  function updateC4UI() {
+    initC4Board();
+    const cells = document.querySelectorAll('.c4-cell');
+    boardC4.forEach((val, i) => {
+      cells[i].className = 'c4-cell ' + (val || '');
+    });
+    document.getElementById('c4Status').innerText = "Turn: " + (turnC4 === 'red' ? 'Red 🔴' : 'Yellow 🟡');
+  }
+
+  function resetC4(b) { boardC4.fill(''); turnC4 = 'red'; updateC4UI(); if(b && roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 }); }
 
   // --- DRAWING CANVAS ---
   let canvas, ctx, drawing = false, lastX = 0, lastY = 0;
@@ -581,7 +536,6 @@
     if(b && roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic }); 
   }
 
-  // Auto connect on start
   connectRoom();
 </script>
 
