@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FamilyHaven Play</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     :root {
       --primary: #2b5876;
@@ -22,6 +25,10 @@
     .tab-btn { flex: 1; padding: 12px 6px; border: none; background: #e0e6ed; color: #555; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
     .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(43,88,118,0.3); }
     .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 15px; }
+    
+    /* Room Setup */
+    .room-bar { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 15px; background: #e2e8f0; padding: 10px; border-radius: 12px; }
+    .room-input { width: 100px; padding: 8px; font-size: 1.1rem; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: bold; }
     
     /* Avatars */
     .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
@@ -45,6 +52,7 @@
     /* Board games */
     .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 280px; margin: 15px auto; }
     .cell { aspect-ratio: 1; background: #f1f5f9; border-radius: 10px; font-size: 2.2rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+    .status-text { margin-bottom: 10px; font-weight: bold; color: var(--primary); }
   </style>
 </head>
 <body>
@@ -54,6 +62,13 @@
     <h1>FamilyHaven Play 🌍</h1>
     <p>Connecting Dallas 🇺🇸 St. Louis 🇺🇸 Istanbul 🇹🇷 Lebanon 🇱🇧</p>
   </header>
+
+  <!-- ROOM CODE SETUP -->
+  <div class="card room-bar">
+    <label for="roomCode"><strong>Room Code:</strong></label>
+    <input type="text" id="roomCode" class="room-input" value="1234" maxlength="4">
+    <button class="btn" onclick="connectRoom()">Connect Room</button>
+  </div>
 
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('family')">Family</button>
@@ -66,14 +81,14 @@
   <div id="tab-family" class="card">
     <h3>Choose Your Player Profile</h3>
     <div class="avatar-grid">
-      <div class="avatar-card selected" onclick="selectAvatar(this)"><span>👴</span><p>Jedo</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>👵</span><p>Teta</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>👩</span><p>Mama / Sara</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>👦</span><p>Fouad</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>⚽</span><p>Zayd</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🎨</span><p>Majd</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇱🇧</span><p>Cousins (Lebanon)</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇹🇷</span><p>Cousins (Istanbul)</p></div>
+      <div class="avatar-card selected" onclick="selectAvatar(this, 'Jedo 👴')"><span>👴</span><p>Jedo</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Teta 👵')"><span>👵</span><p>Teta</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Mama / Sara 👩')"><span>👩</span><p>Mama / Sara</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Fouad 👦')"><span>👦</span><p>Fouad</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Zayd ⚽')"><span>⚽</span><p>Zayd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Majd 🎨')"><span>🎨</span><p>Majd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Lebanon 🇱🇧')"><span>🇱🇧</span><p>Cousins (Lebanon)</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Istanbul 🇹🇷')"><span>🇹🇷</span><p>Cousins (Istanbul)</p></div>
     </div>
   </div>
 
@@ -88,17 +103,18 @@
   <!-- DRAWING TAB -->
   <div id="tab-draw" class="card" style="display:none;">
     <h3>Family Touch Canvas</h3>
-    <p style="font-size:0.8rem; margin-bottom:10px;">Draw together across devices!</p>
+    <p style="font-size:0.8rem; margin-bottom:10px;">Draw together across devices in real time!</p>
     <canvas id="paintCanvas"></canvas>
     <div class="controls">
       <input type="color" id="colorPicker" value="#ff7e5f">
-      <button class="btn btn-secondary" onclick="clearCanvas()">Clear</button>
+      <button class="btn btn-secondary" onclick="clearCanvas(true)">Clear</button>
     </div>
   </div>
 
   <!-- GAMES TAB -->
   <div id="tab-games" class="card" style="display:none;">
-    <h3>Tic-Tac-Toe Arena</h3>
+    <h3>Live Tic-Tac-Toe Arena</h3>
+    <div class="status-text" id="gameStatus">Current Turn: ❌</div>
     <div class="board-grid" id="ticBoard">
       <div class="cell" onclick="playTic(0)"></div>
       <div class="cell" onclick="playTic(1)"></div>
@@ -110,26 +126,78 @@
       <div class="cell" onclick="playTic(7)"></div>
       <div class="cell" onclick="playTic(8)"></div>
     </div>
-    <button class="btn btn-secondary" onclick="resetTic()">Reset Game</button>
+    <button class="btn btn-secondary" onclick="resetTic(true)">Reset Game</button>
   </div>
 </div>
 
 <script>
+  // Pre-filled with your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBvUCpwqDe9VwDnuLo3EP34BbTEFljqjfs",
+    authDomain: "fouad-n-family.firebaseapp.com",
+    databaseURL: "https://fouad-n-family-default-rtdb.firebaseio.com",
+    projectId: "fouad-n-family",
+    storageBucket: "fouad-n-family.firebasestorage.app",
+    messagingSenderId: "252522964252",
+    appId: "1:252522964252:web:8e2ff641709b5c728806d9"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  let roomRef = null;
+  let currentRoom = "1234";
+
+  function connectRoom() {
+    currentRoom = document.getElementById('roomCode').value.trim() || "1234";
+    roomRef = db.ref('rooms/' + currentRoom);
+    listenToRoom();
+    alert("Connected to Room Code: " + currentRoom);
+  }
+
+  function listenToRoom() {
+    if (!roomRef) return;
+    
+    // Sync Game State
+    roomRef.child('game').on('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        board = data.board || Array(9).fill('');
+        turn = data.turn || '❌';
+        updateBoardUI();
+      }
+    });
+
+    // Sync Drawing Coordinates
+    roomRef.child('draw').on('child_added', snapshot => {
+      const pt = snapshot.val();
+      if (pt && ctx) drawLine(pt.x0, pt.y0, pt.x1, pt.y1, pt.color);
+    });
+
+    // Sync Canvas Clears
+    roomRef.child('draw_clear').on('value', snapshot => {
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
+  }
+
+  // Initial connect to default room 1234
+  connectRoom();
+
+  // --- TAB NAVIGATION ---
   function showTab(name) {
     ['family', 'trivia', 'draw', 'games'].forEach(t => {
       document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
     });
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     event.target.classList.add('active');
-    if(name === 'draw') initCanvas();
+    if(name === 'draw') setTimeout(initCanvas, 50);
   }
 
-  function selectAvatar(el) {
+  function selectAvatar(el, name) {
     document.querySelectorAll('.avatar-card').forEach(a => a.classList.remove('selected'));
     el.classList.add('selected');
   }
 
-  // TRIVIA LOGIC
+  // --- TRIVIA LOGIC ---
   const questions = [
     { q: "Where do Fouad, Zayd, and Majd live?", opts: ["St. Louis", "Dallas", "Istanbul", "Beirut"], ans: 1 },
     { q: "Where do their cousins live?", opts: ["Lebanon & Istanbul", "Dallas", "New York", "London"], ans: 0 },
@@ -162,48 +230,91 @@
   function nextQuestion() { curQ = (curQ + 1) % questions.length; loadQuestion(); }
   loadQuestion();
 
-  // CANVAS LOGIC
-  let canvas, ctx, drawing = false;
+  // --- DRAWING CANVAS LOGIC ---
+  let canvas, ctx, drawing = false, lastX = 0, lastY = 0;
+
   function initCanvas() {
     canvas = document.getElementById('paintCanvas');
     ctx = canvas.getContext('2d');
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     
-    function start(e) { drawing = true; draw(e); }
-    function stop() { drawing = false; ctx.beginPath(); }
+    function start(e) {
+      drawing = true;
+      const rect = canvas.getBoundingClientRect();
+      lastX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      lastY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    }
+    function stop() { drawing = false; }
     function draw(e) {
       if(!drawing) return;
       const rect = canvas.getBoundingClientRect();
       const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
       const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-      ctx.lineWidth = 4;
-      ctx.lineCap = 'round';
-      ctx.strokeStyle = document.getElementById('colorPicker').value;
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+      const color = document.getElementById('colorPicker').value;
+
+      drawLine(lastX, lastY, x, y, color);
+
+      if (roomRef) {
+        roomRef.child('draw').push({ x0: lastX, y0: lastY, x1: x, y1: y, color: color });
+      }
+
+      lastX = x;
+      lastY = y;
     }
+
     canvas.onmousedown = start; canvas.onmouseup = stop; canvas.onmousemove = draw;
     canvas.ontouchstart = start; canvas.ontouchend = stop; canvas.ontouchmove = draw;
   }
-  function clearCanvas() { if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-  // TIC-TAC-TOE LOGIC
+  function drawLine(x0, y0, x1, y1, color) {
+    if (!ctx) return;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+  }
+
+  function clearCanvas(broadcast) {
+    if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if(broadcast && roomRef) {
+      roomRef.child('draw').remove();
+      roomRef.child('draw_clear').set(Date.now());
+    }
+  }
+
+  // --- TIC-TAC-TOE LOGIC ---
   let board = Array(9).fill('');
   let turn = '❌';
+
   function playTic(i) {
     if(!board[i]) {
       board[i] = turn;
-      document.getElementsByClassName('cell')[i].innerText = turn;
       turn = (turn === '❌') ? '⭕' : '❌';
+      updateBoardUI();
+      if(roomRef) {
+        roomRef.child('game').set({ board: board, turn: turn });
+      }
     }
   }
-  function resetTic() {
-    board.fill('');
-    Array.from(document.getElementsByClassName('cell')).forEach(c => c.innerText = '');
+
+  function updateBoardUI() {
+    Array.from(document.getElementsByClassName('cell')).forEach((c, idx) => {
+      c.innerText = board[idx] || '';
+    });
+    document.getElementById('gameStatus').innerText = "Current Turn: " + turn;
+  }
+
+  function resetTic(broadcast) {
+    board = Array(9).fill('');
     turn = '❌';
+    updateBoardUI();
+    if(broadcast && roomRef) {
+      roomRef.child('game').set({ board: board, turn: turn });
+    }
   }
 </script>
 
