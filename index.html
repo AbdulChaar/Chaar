@@ -51,7 +51,7 @@
     
     /* Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { flex: 1; min-width: 70px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+    .tab-btn { flex: 1; min-width: 65px; padding: 10px 4px; border: none; background: rgba(255, 255, 255, 0.8); color: #333; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
     .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 8px rgba(37,99,235,0.4); }
     
     .card { background: var(--card-bg); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.15); margin-bottom: 12px; }
@@ -70,6 +70,12 @@
 
     /* Canvas */
     canvas { border: 2px dashed #cbd5e1; border-radius: 12px; width: 100%; height: 280px; background: white; touch-action: none; }
+
+    /* Pac-Man Arcade Styling */
+    .pacman-container { text-align: center; }
+    #pacmanCanvas { background: #000; border-radius: 12px; border: 4px solid #1e3a8a; margin: 0 auto; display: block; }
+    .dpad { display: grid; grid-template-columns: repeat(3, 48px); gap: 6px; justify-content: center; margin-top: 10px; }
+    .dpad-btn { width: 48px; height: 48px; font-size: 1.4rem; font-weight: bold; background: #334155; color: white; border: none; border-radius: 10px; cursor: pointer; }
 
     /* Puzzle Styling */
     .puzzle-grid { display: grid; gap: 4px; max-width: 300px; margin: 15px auto; background: #1e293b; padding: 8px; border-radius: 12px; }
@@ -115,7 +121,7 @@
       <button class="theme-btn" style="background: linear-gradient(135deg, #15803d, #4ade80);" onclick="setTheme('green')" title="Emerald"></button>
     </div>
     <div>
-      <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()">⚡ Music: OFF</button>
+      <button class="btn btn-secondary" id="musicBtn" onclick="toggleMusic()">🎮 Arcade Music: OFF</button>
     </div>
   </div>
 
@@ -138,6 +144,7 @@
   <!-- NAVIGATION TABS -->
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('family')">Profile</button>
+    <button class="tab-btn" onclick="showTab('pacman')">Pac-Man 💛</button>
     <button class="tab-btn" onclick="showTab('hangman')">Hangman 🔤</button>
     <button class="tab-btn" onclick="showTab('puzzle')">Puzzle 🧩</button>
     <button class="tab-btn" onclick="showTab('tictactoe')">Tic-Tac-Toe ❌</button>
@@ -157,6 +164,26 @@
       <div class="avatar-card" onclick="selectAvatar(this, 'Majd 🎨')"><span>🎨</span><p>Majd (10)</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Lebanon 🇱🇧')"><span>🇱🇧</span><p>Cousins (Lebanon)</p></div>
       <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Istanbul 🇹🇷')"><span>🇹🇷</span><p>Cousins (Istanbul)</p></div>
+    </div>
+  </div>
+
+  <!-- PAC-MAN GAME TAB -->
+  <div id="tab-pacman" class="card pacman-container" style="display:none;">
+    <h3>Retro Pac-Man Arcade 💛</h3>
+    <div class="status-text" id="pacmanStatus">Score: 0 | High Score: 0</div>
+    <canvas id="pacmanCanvas" width="300" height="300"></canvas>
+    
+    <!-- Touch Controls for Mobile/Tablet -->
+    <div class="dpad">
+      <div></div>
+      <button class="dpad-btn" onclick="setPacDirection('UP')">⬆️</button>
+      <div></div>
+      <button class="dpad-btn" onclick="setPacDirection('LEFT')">⬅️</button>
+      <button class="dpad-btn" onclick="resetPacman()">🔄</button>
+      <button class="dpad-btn" onclick="setPacDirection('RIGHT')">➡️</button>
+      <div></div>
+      <button class="dpad-btn" onclick="setPacDirection('DOWN')">⬇️</button>
+      <div></div>
     </div>
   </div>
 
@@ -246,7 +273,7 @@
   let roomRef = null;
   let currentRoom = "1234";
 
-  // --- AUDIO SYNTHESIS ---
+  // --- AUDIO SYNTHESIS & ENTERTAINING ARCADE MUSIC ---
   let audioCtx = null;
   let isMusicPlaying = false;
   let musicTimer = null;
@@ -276,394 +303,21 @@
     fanfare.forEach((f, idx) => setTimeout(() => playTone(f, 'triangle', 0.25, 0.15), idx * 120));
   }
 
+  // Fast-Paced Upbeat Retro Arcade Melody
   function toggleMusic() {
     initAudio();
     isMusicPlaying = !isMusicPlaying;
     const btn = document.getElementById('musicBtn');
     if (isMusicPlaying) {
-      btn.innerText = "⚡ Music: ON";
-      const melody = [329.63, 329.63, 0, 329.63, 0, 261.63, 329.63, 0, 392.00, 0, 0, 0, 196.00];
+      btn.innerText = "🎮 Arcade Music: ON";
+      const arcadeMelody = [
+        493.88, 493.88, 987.77, 739.99, 659.25, 622.25, 659.25, 0,
+        523.25, 523.25, 1046.50, 783.99, 698.46, 659.25, 698.46, 0,
+        587.33, 587.33, 1174.66, 880.00, 783.99, 739.99, 783.99, 0,
+        987.77, 880.00, 783.99, 698.46, 659.25, 587.33, 523.25, 493.88
+      ];
       let step = 0;
       musicTimer = setInterval(() => {
-        const note = melody[step % melody.length];
-        if (note > 0) playTone(note, 'square', 0.12, 0.04);
-        step++;
-      }, 160);
-    } else {
-      btn.innerText = "⚡ Music: OFF";
-      clearInterval(musicTimer);
-    }
-  }
-
-  function setTheme(theme) {
-    const gradients = {
-      dark: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-      blue: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
-      green: 'linear-gradient(135deg, #15803d 0%, #4ade80 100%)'
-    };
-    document.body.style.background = gradients[theme] || gradients.dark;
-    playTone(440, 'triangle', 0.1);
-  }
-
-  // --- VOICE MESSAGES ---
-  let mediaRecorder = null, audioChunks = [];
-  function startVoiceRecording() {
-    initAudio();
-    document.getElementById('voiceStatus').innerText = "🎙️ Recording... Release button to send!";
-    document.getElementById('voiceStatus').style.color = "#ef4444";
-    audioChunks = [];
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          if (roomRef) roomRef.child('voice_notes').push({ audio: reader.result, timestamp: Date.now() });
-        };
-      };
-      mediaRecorder.start();
-    }).catch(() => { document.getElementById('voiceStatus').innerText = "Microphone access denied."; });
-  }
-
-  function stopVoiceRecording() {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-      document.getElementById('voiceStatus').innerText = "Hold button, talk, and release to send";
-      document.getElementById('voiceStatus').style.color = "#666";
-      playTone(587.33, 'sine', 0.2);
-    }
-  }
-
-  // --- FIREBASE SYNC ---
-  function connectRoom() {
-    currentRoom = document.getElementById('roomCode').value.trim() || "1234";
-    roomRef = db.ref('rooms/' + currentRoom);
-    listenToRoom();
-    alert("Connected to Room Code: " + currentRoom);
-  }
-
-  function listenToRoom() {
-    if (!roomRef) return;
-    roomRef.child('voice_notes').limitToLast(1).on('child_added', snapshot => {
-      const data = snapshot.val();
-      if (data && data.audio) {
-        document.getElementById('voicePlayerContainer').innerHTML = `<audio controls src="${data.audio}" autoplay style="width:100%; height:36px;"></audio>`;
-      }
-    });
-
-    roomRef.child('c4').on('value', snapshot => {
-      const data = snapshot.val();
-      if (data) { boardC4 = data.board || Array(42).fill(''); turnC4 = data.turn || 'red'; updateC4UI(); }
-    });
-
-    roomRef.child('tic').on('value', snapshot => {
-      const data = snapshot.val();
-      if (data) { boardTic = data.board || Array(9).fill(''); turnTic = data.turn || '❌'; updateTicUI(); }
-    });
-
-    roomRef.child('draw').on('child_added', snapshot => {
-      const pt = snapshot.val();
-      if (pt && ctx) drawLine(pt.x0, pt.y0, pt.x1, pt.y1, pt.color);
-    });
-    roomRef.child('draw_clear').on('value', () => { if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); });
-  }
-
-  // --- TAB ROUTING ---
-  function showTab(name) {
-    ['family', 'hangman', 'puzzle', 'tictactoe', 'connect4', 'draw'].forEach(t => {
-      document.getElementById('tab-' + t).style.display = (t === name) ? 'block' : 'none';
-    });
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    if(name === 'draw') setTimeout(initCanvas, 50);
-    if(name === 'hangman') resetHangman();
-    if(name === 'puzzle') shufflePuzzle();
-    if(name === 'connect4') initC4Board();
-  }
-
-  function selectAvatar(el, name) {
-    document.querySelectorAll('.avatar-card').forEach(a => a.classList.remove('selected'));
-    el.classList.add('selected');
-    playTone(523.25, 'sine', 0.1);
-  }
-
-  // --- HANGMAN STUDIO WITH ISLAMIC CATEGORY ---
-  const hangmanData = {
-    islamic: [
-      { w: "RAMADAN", h: "The holy month of fasting and reflection" },
-      { w: "QURAN", h: "The holy book revealed to Prophet Muhammad (PBUH)" },
-      { w: "KAABA", h: "The sacred house located in Makkah" },
-      { w: "PROPHET", h: "A messenger sent by Allah to guide humanity" },
-      { w: "MASJID", h: "Place of worship and community gathering" },
-      { w: "SUHOOR", h: "Pre-dawn meal eaten before starting the fast" },
-      { w: "IFTAR", h: "The evening meal eaten to break the fast at sunset" }
-    ],
-    soccer: [
-      { w: "PENALTY", h: "A free kick taken right in front of the goal" },
-      { w: "STRIKER", h: "The player whose main job is to score goals" },
-      { w: "RONALDO", h: "Famous Portuguese #7 football legend" },
-      { w: "MESSI", h: "Argentine World Cup winner" },
-      { w: "DRIBBLE", h: "Moving the ball past opponents with quick footwork" }
-    ],
-    cities: [
-      { w: "DALLAS", h: "Famous Texas city home to Fouad, Zayd, & Majd!" },
-      { w: "BEIRUT", h: "The beautiful capital city of Lebanon" },
-      { w: "ISTANBUL", h: "Historic city straddling Europe & Asia" },
-      { w: "STLOUIS", h: "Famous Gateway Arch city in Missouri" }
-    ],
-    family: [
-      { w: "JEDO", h: "The loving grandfather!" },
-      { w: "TETA", h: "The caring grandmother!" },
-      { w: "COUSINS", h: "Family connected between US, Turkey, & Lebanon" }
-    ]
-  };
-
-  let currentCategory = 'islamic';
-  let curHangItem = {};
-  let guessedLetters = [];
-  let lives = 6;
-
-  function setSubject(sub) {
-    currentCategory = sub;
-    document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
-    resetHangman();
-  }
-
-  function resetHangman() {
-    const list = hangmanData[currentCategory];
-    curHangItem = list[Math.floor(Math.random() * list.length)];
-    guessedLetters = [];
-    lives = 6;
-    document.getElementById('hintBox').innerText = '💡 Tap "Get Hint" for a clue!';
-    renderHangman();
-  }
-
-  function showHint() {
-    document.getElementById('hintBox').innerText = "💡 Clue: " + curHangItem.h;
-    playTone(700, 'sine', 0.1);
-  }
-
-  function renderHangman() {
-    document.getElementById('hangmanStatus').innerText = "Lives Remaining: " + "❤️".repeat(lives);
-    let display = "";
-    for(let char of curHangItem.w) {
-      display += guessedLetters.includes(char) ? char + " " : "_ ";
-    }
-    document.getElementById('wordDisplay').innerText = display;
-
-    const kb = document.getElementById('hangmanKeyboard');
-    kb.innerHTML = "";
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(let => {
-      const btn = document.createElement('button');
-      btn.className = "key-btn" + (guessedLetters.includes(let) ? " used" : "");
-      btn.innerText = let;
-      btn.onclick = () => guessLetter(let);
-      kb.appendChild(btn);
-    });
-
-    if(!display.includes("_")) {
-      document.getElementById('hangmanStatus').innerText = "🎉 Word Cleared!";
-      playVictorySound();
-    } else if(lives <= 0) {
-      document.getElementById('hangmanStatus').innerText = "❌ Game Over! Word was: " + curHangItem.w;
-    }
-  }
-
-  function guessLetter(l) {
-    if(!guessedLetters.includes(l) && lives > 0) {
-      guessedLetters.push(l);
-      if(!curHangItem.w.includes(l)) {
-        lives--;
-        playTone(200, 'sawtooth', 0.2);
-      } else {
-        playTone(600, 'sine', 0.1);
-      }
-      renderHangman();
-    }
-  }
-
-  // --- PRO SLIDING PUZZLE ---
-  let puzzleSize = 3;
-  let puzzleTiles = [];
-  let puzzleMoves = 0;
-
-  function setPuzzleMode(size) {
-    puzzleSize = size;
-    const grid = document.getElementById('puzzleGrid');
-    grid.className = `puzzle-grid puzzle-grid-${size}`;
-    shufflePuzzle();
-  }
-
-  function shufflePuzzle() {
-    const count = puzzleSize * puzzleSize;
-    puzzleTiles = Array.from({length: count - 1}, (_, i) => i + 1);
-    puzzleTiles.push("");
-    puzzleTiles.sort(() => Math.random() - 0.5);
-    puzzleMoves = 0;
-    renderPuzzle();
-  }
-
-  function renderPuzzle() {
-    document.getElementById('puzzleStatus').innerText = `Moves: ${puzzleMoves} | Target: 1 to ${puzzleSize * puzzleSize - 1}`;
-    const grid = document.getElementById('puzzleGrid');
-    grid.innerHTML = '';
-    puzzleTiles.forEach((tile, idx) => {
-      const div = document.createElement('div');
-      div.className = 'puzzle-tile' + (tile === "" ? ' empty' : '');
-      div.innerText = tile;
-      div.onclick = () => movePuzzleTile(idx);
-      grid.appendChild(div);
-    });
-  }
-
-  function movePuzzleTile(idx) {
-    const emptyIdx = puzzleTiles.indexOf("");
-    const row = Math.floor(idx / puzzleSize);
-    const col = idx % puzzleSize;
-    const emptyRow = Math.floor(emptyIdx / puzzleSize);
-    const emptyCol = emptyIdx % puzzleSize;
-
-    if ((Math.abs(row - emptyRow) + Math.abs(col - emptyCol)) === 1) {
-      puzzleTiles[emptyIdx] = puzzleTiles[idx];
-      puzzleTiles[idx] = "";
-      puzzleMoves++;
-      playTone(450, 'sine', 0.1);
-      renderPuzzle();
-      
-      const target = Array.from({length: puzzleSize * puzzleSize - 1}, (_, i) => i + 1).join('');
-      if (puzzleTiles.slice(0, -1).join('') === target) {
-        document.getElementById('puzzleStatus').innerText = `🎉 Solved in ${puzzleMoves} moves!`;
-        playVictorySound();
-      }
-    }
-  }
-
-  // --- CONNECT 4 ---
-  let boardC4 = Array(42).fill('');
-  let turnC4 = 'red';
-
-  function initC4Board() {
-    const b = document.getElementById('c4Board');
-    if(b.children.length > 0) return;
-    b.innerHTML = '';
-    for(let i=0; i<42; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'c4-cell';
-      cell.onclick = () => dropC4(i % 7);
-      b.appendChild(cell);
-    }
-  }
-
-  function dropC4(col) {
-    for(let r=5; r>=0; r--) {
-      let idx = r * 7 + col;
-      if(!boardC4[idx]) {
-        boardC4[idx] = turnC4;
-        turnC4 = (turnC4 === 'red') ? 'yellow' : 'red';
-        updateC4UI();
-        playTone(300, 'sine', 0.12);
-        if(roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 });
-        break;
-      }
-    }
-  }
-
-  function updateC4UI() {
-    initC4Board();
-    const cells = document.querySelectorAll('.c4-cell');
-    boardC4.forEach((val, i) => {
-      cells[i].className = 'c4-cell ' + (val || '');
-    });
-    document.getElementById('c4Status').innerText = "Turn: " + (turnC4 === 'red' ? 'Red 🔴' : 'Yellow 🟡');
-  }
-
-  function resetC4(b) { boardC4.fill(''); turnC4 = 'red'; updateC4UI(); if(b && roomRef) roomRef.child('c4').set({ board: boardC4, turn: turnC4 }); }
-
-  // --- DRAWING CANVAS ---
-  let canvas, ctx, drawing = false, lastX = 0, lastY = 0;
-  function initCanvas() {
-    canvas = document.getElementById('paintCanvas');
-    ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    
-    function start(e) {
-      drawing = true;
-      const rect = canvas.getBoundingClientRect();
-      lastX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-      lastY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-    }
-    function stop() { drawing = false; }
-    function draw(e) {
-      if(!drawing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
-      const color = document.getElementById('colorPicker').value;
-      drawLine(lastX, lastY, x, y, color);
-      if (roomRef) roomRef.child('draw').push({ x0: lastX, y0: lastY, x1: x, y1: y, color: color });
-      lastX = x; lastY = y;
-    }
-
-    canvas.onmousedown = start; canvas.onmouseup = stop; canvas.onmousemove = draw;
-    canvas.ontouchstart = start; canvas.ontouchend = stop; canvas.ontouchmove = draw;
-  }
-
-  function drawLine(x0, y0, x1, y1, color) {
-    if (!ctx) return;
-    ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
-  }
-
-  function clearCanvas(broadcast) {
-    if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if(broadcast && roomRef) { roomRef.child('draw').remove(); roomRef.child('draw_clear').set(Date.now()); }
-  }
-
-  // --- TIC TAC TOE ---
-  let boardTic = Array(9).fill('');
-  let turnTic = '❌';
-
-  function playTic(i) {
-    if(!boardTic[i]) {
-      boardTic[i] = turnTic;
-      playTone(400, 'square', 0.1);
-      
-      if (checkTicWin(turnTic)) {
-        document.getElementById('ticStatus').innerText = "🎉 Player " + turnTic + " Wins!";
-        playVictorySound();
-      } else {
-        turnTic = (turnTic === '❌') ? '⭕' : '❌';
-        document.getElementById('ticStatus').innerText = "Current Turn: " + turnTic;
-      }
-      
-      updateTicUI();
-      if(roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic });
-    }
-  }
-
-  function checkTicWin(p) {
-    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    return wins.some(w => w.every(idx => boardTic[idx] === p));
-  }
-
-  function updateTicUI() {
-    Array.from(document.querySelectorAll('#tab-tictactoe .cell')).forEach((c, idx) => c.innerText = boardTic[idx] || '');
-  }
-
-  function resetTic(b) { 
-    boardTic.fill(''); 
-    turnTic = '❌'; 
-    document.getElementById('ticStatus').innerText = "Current Turn: ❌";
-    updateTicUI(); 
-    if(b && roomRef) roomRef.child('tic').set({ board: boardTic, turn: turnTic }); 
-  }
-
-  connectRoom();
-</script>
-
-</body>
-</html>
+        const note = arcadeMelody[step % arcadeMelody.length];
+        if (note > 0) playTone(note, 'square', 0.11, 0.04);
+        if (step %
