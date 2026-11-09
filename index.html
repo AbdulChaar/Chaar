@@ -18,15 +18,22 @@
 
     .utility-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 6px; }
 
-    /* Horizontal Scrollable Navigation Tabs */
+    /* Scrollable Tabs */
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
     .tab-btn { flex: 0 0 auto; padding: 8px 12px; border: none; background: rgba(255,255,255,0.85); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
     .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 6px rgba(37,99,235,0.4); }
 
     .card { background: var(--card-bg); border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-    .voice-btn { background: #ef4444; color: white; border: none; padding: 10px 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+    
+    /* Live Chat Box Styling */
+    .chat-box { max-height: 140px; overflow-y: auto; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; margin-bottom: 8px; font-size: 0.8rem; }
+    .chat-msg { margin-bottom: 6px; }
+    .chat-msg strong { color: var(--primary); }
+    .chat-input-row { display: flex; gap: 6px; margin-top: 6px; }
+    .chat-input { flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.8rem; }
+    .voice-btn { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
 
-    /* Responsive Profile Grid */
+    /* Profile Grid */
     .avatar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
     .avatar-card { border: 2px solid #cbd5e1; border-radius: 10px; padding: 8px 4px; text-align: center; cursor: pointer; background: white; }
     .avatar-card.selected { border-color: var(--secondary); background: #eff6ff; box-shadow: 0 0 0 2px var(--secondary); }
@@ -71,10 +78,17 @@
     <div style="font-weight:bold; color:white; font-size:0.8rem;">Room Code: <input type="text" id="roomCode" value="1234" style="width:45px; text-align:center;"></div>
   </div>
 
-  <div class="card" style="text-align:center; padding:8px;">
-    <button class="voice-btn" onmousedown="startVoiceRecording()" onmouseup="stopVoiceRecording()" ontouchstart="startVoiceRecording()" ontouchend="stopVoiceRecording()">🎤 Hold to Record Voice Note</button>
-    <div id="voiceStatus" style="font-size:0.7rem; margin-top:4px; color:#64748b;">Hold to talk, release to send</div>
-    <div id="voicePlayerContainer"></div>
+  <!-- LIVE CHAT & VOICE SECTION -->
+  <div class="card">
+    <div class="chat-box" id="chatFeed">
+      <div class="chat-msg"><em>Welcome to FamilyHaven Chat! Select a profile below and start messaging.</em></div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="chatMsgInput" class="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+      <button class="btn" onclick="sendChatMessage()">Send 📤</button>
+      <button class="voice-btn" onmousedown="startVoiceRecording()" onmouseup="stopVoiceRecording()" ontouchstart="startVoiceRecording()" ontouchend="stopVoiceRecording()">🎤 Voice</button>
+    </div>
+    <div id="voiceStatus" style="font-size:0.7rem; margin-top:2px; color:#64748b; text-align:center;">Hold 🎤 Voice to talk, release to send</div>
   </div>
 
   <div class="nav-tabs">
@@ -91,14 +105,14 @@
   <div id="tab-family" class="card">
     <h3 style="font-size:1rem;">Select Your Profile</h3>
     <div class="avatar-grid">
-      <div class="avatar-card selected" onclick="selectAvatar(this)"><span>👴</span><p>Jedo</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>👵</span><p>Teta</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>👩</span><p>Mama / Sara</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>⚽</span><p>Fouad</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🏃</span><p>Zayd</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🎨</span><p>Majd</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇱🇧</span><p>Lebanon</p></div>
-      <div class="avatar-card" onclick="selectAvatar(this)"><span>🇹🇷</span><p>Istanbul</p></div>
+      <div class="avatar-card selected" onclick="selectAvatar(this, 'Jedo 👴')"><span>👴</span><p>Jedo</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Teta 👵')"><span>👵</span><p>Teta</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Mama / Sara 👩')"><span>👩</span><p>Mama / Sara</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Fouad ⚽')"><span>⚽</span><p>Fouad</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Zayd 🏃')"><span>🏃</span><p>Zayd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Majd 🎨')"><span>🎨</span><p>Majd</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Lebanon 🇱🇧')"><span>🇱🇧</span><p>Lebanon</p></div>
+      <div class="avatar-card" onclick="selectAvatar(this, 'Cousins Istanbul 🇹🇷')"><span>🇹🇷</span><p>Istanbul</p></div>
     </div>
   </div>
 
@@ -189,7 +203,9 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   let roomRef = db.ref('rooms/1234');
+  let currentProfileName = "Jedo 👴";
 
+  /* AUDIO SYSTEM */
   let audioCtx = null, isMusicPlaying = false, musicTimer = null;
   function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
   function playTone(freq, type, dur) {
@@ -223,6 +239,21 @@
     }
   }
 
+  /* REAL-TIME LIVE TEXT & VOICE CHAT */
+  function sendChatMessage() {
+    var input = document.getElementById('chatMsgInput');
+    var text = input.value.trim();
+    if (text !== "") {
+      roomRef.child('messages').push({
+        sender: currentProfileName,
+        text: text,
+        type: 'text',
+        timestamp: Date.now()
+      });
+      input.value = "";
+    }
+  }
+
   let mediaRecorder = null, audioChunks = [];
   function startVoiceRecording() {
     initAudio(); 
@@ -233,16 +264,35 @@
       mediaRecorder.onstop = function() {
         const reader = new FileReader();
         reader.readAsDataURL(new Blob(audioChunks, { type: 'audio/webm' }));
-        reader.onloadend = function() { roomRef.child('voice_notes').push({ audio: reader.result }); };
+        reader.onloadend = function() {
+          roomRef.child('messages').push({
+            sender: currentProfileName,
+            audio: reader.result,
+            type: 'audio',
+            timestamp: Date.now()
+          });
+        };
       };
       mediaRecorder.start();
     }).catch(function() {});
   }
   function stopVoiceRecording() { if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop(); }
 
-  roomRef.child('voice_notes').limitToLast(1).on('child_added', function(snap) {
+  // Listen to incoming text & voice messages
+  roomRef.child('messages').limitToLast(15).on('child_added', function(snap) {
     const d = snap.val();
-    if (d && d.audio) document.getElementById('voicePlayerContainer').innerHTML = '<audio controls src="' + d.audio + '" autoplay style="width:100%; height:30px; margin-top:4px;"></audio>';
+    if (!d) return;
+    var feed = document.getElementById('chatFeed');
+    var msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-msg';
+
+    if (d.type === 'audio') {
+      msgDiv.innerHTML = '<strong>' + d.sender + ':</strong> <br><audio controls src="' + d.audio + '" style="width:100%; height:30px; margin-top:2px;"></audio>';
+    } else {
+      msgDiv.innerHTML = '<strong>' + d.sender + ':</strong> ' + d.text;
+    }
+    feed.appendChild(msgDiv);
+    feed.scrollTop = feed.scrollHeight;
   });
 
   function showTab(name, btnEl) {
@@ -261,10 +311,11 @@
     if(name === 'connect4') initC4Board();
   }
 
-  function selectAvatar(el) {
+  function selectAvatar(el, profileName) {
     var cards = document.querySelectorAll('.avatar-card');
     for (var i = 0; i < cards.length; i++) { cards[i].classList.remove('selected'); }
     el.classList.add('selected');
+    if (profileName) currentProfileName = profileName;
     playTone(523, 'sine', 0.08);
   }
 
